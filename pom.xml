@@ -14,10 +14,9 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.1</version>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
-                    <execution>
+<!--                    <execution>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
@@ -29,7 +28,27 @@
                                 </transformer>
                             </transformers>
                         </configuration>
+                    </execution>-->
+                    
+                    <execution>
+                        <id>canali-buildminiindex-id</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>edu.ucla.cs.scai.canali.core.index.BuildMiniIndex</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>canali-BuildMiniIndex.jar</finalName>
+                        </configuration>
                     </execution>
+                    
                 </executions>
             </plugin>
         </plugins>
