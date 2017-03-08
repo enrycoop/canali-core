@@ -16,6 +16,18 @@ import java.util.Arrays;
  */
 public class TestCanali {
 
+    private String getLastAcceptedProperty(ArrayList<AutocompleteObject> acceptedTokens){
+        int i =  acceptedTokens.size() - 1;
+        while (i > 0) {            
+            if ( (!(acceptedTokens.get(i - 1)).state.equals(AutocompleteService.ACCEPT_PROPERTY_FOR_RANK_STATE_S9)) &&
+                (acceptedTokens.get(i).tokenType).equals(AutocompleteService.PROPERTY)) {
+                return acceptedTokens.get(i).labels;
+            }
+            i--;
+        }
+        return null;
+    }
+    
     @SuppressWarnings("empty-statement")
     public static void main(String... args) throws Exception {
 
@@ -29,29 +41,17 @@ public class TestCanali {
         boolean autoAcceptance = true;              //aa
         boolean dateToNumber = false;               //dtn
         boolean useKeywords = false;                //k
-
+        
         ArrayList<AutocompleteObject> res = new AutocompleteService().getAutocompleResults(query, lastAcceptedProperty,
                 openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, autoAcceptance, dateToNumber, useKeywords);
 
-//        for (int i = 0; i < res.size(); i++) {
-//            AutocompleteObject r = res.get(i);
-//            System.out.println("============================================");
-//            System.out.println("res[" + i + "]");
-//            System.out.println("text:" + r.text);
-//            System.out.println("restrictedText:" + r.restrictedText);
-//            System.out.println("state:" + r.state);
-//            System.out.println("labels:" + r.labels);
-//            System.out.println("tokenType:" + r.tokenType);
-//            System.out.println("finalPunctuation:" + r.finalPunctuation);
-//            System.out.println("relatedTokenPosition:" + r.relatedTokenPosition);
-//            System.out.println("isPrefix:" + r.isPrefix);
-//            System.out.println("mustBeAccepted:" + r.mustBeAccepted);
-//            System.out.println("similarity:" + r.similarity);
-//            System.out.println("prefixSimilarity:" + r.prefixSimilarity);
-//            System.out.println("remainder:" + r.remainder);
-//            System.out.println("keywords:" + Arrays.toString(r.keywords));
-//            System.out.println("============================================");
-//        }
+        ArrayList<AutocompleteObject> acceptedTokens = new ArrayList<AutocompleteObject>();
+        
+
+       
+        
+        
+        
         do {
             System.out.println("==========testCanali");
             for (int i = 0; i < res.size(); i++) {
