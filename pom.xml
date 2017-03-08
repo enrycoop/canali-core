@@ -31,7 +31,7 @@
                     </execution>-->
                     
                     <execution>
-                        <id>canali-buildminiindex-id</id>
+                        <id>canali-buildluceneindex-id</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
@@ -39,13 +39,13 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>edu.ucla.cs.scai.canali.core.index.BuildMiniIndex</mainClass>
+                                    <mainClass>edu.ucla.cs.scai.canali.core.index.BuildLuceneIndex</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>canali-BuildMiniIndex.jar</finalName>
+                            <finalName>canali-BuildLuceneIndex.jar</finalName>
                         </configuration>
                     </execution>
                     

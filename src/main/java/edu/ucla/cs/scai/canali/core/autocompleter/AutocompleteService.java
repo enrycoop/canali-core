@@ -25,6 +25,7 @@ import edu.ucla.cs.scai.canali.core.index.tokens.Token;
 import edu.ucla.cs.scai.canali.core.index.tokens.TopKOperatorToken;
 import edu.ucla.cs.scai.canali.core.index.tokens.UnaryOperatorToken;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -211,6 +212,35 @@ public class AutocompleteService {
     }
 
     public ArrayList<AutocompleteObject> getAutocompleResults(String query, String lastAcceptedProperty, String[] openVariablesUri, Integer[] openVariablesPosition, String currentState, String finalPunctuation, boolean disableContextRules, boolean autoAcceptance, boolean dateToNumber, boolean useKeywords) {
+       System.out.println("==========getAutocompleResults");
+       System.out.println("query: " + query);
+       System.out.println("lastAcceptedProperty: " + lastAcceptedProperty);
+       
+       if(openVariablesUri != null){
+            for(String ou : openVariablesUri){
+                System.out.println("openVariablesUri: " + ou);
+            }
+       }else{
+           System.out.println("openVariablesUri: null");
+       }
+       
+        if(openVariablesPosition != null){
+            for(Integer op : openVariablesPosition){
+                System.out.println("openVariablesPosition: " + op);
+            }
+       }else{
+           System.out.println("openVariablesPosition: null");
+       }
+        
+       System.out.println("currentState: " + currentState);
+       System.out.println("finalPunctuation: " + finalPunctuation);
+       System.out.println("disableContextRules: " + disableContextRules);
+       System.out.println("autoAcceptance: " + autoAcceptance);
+       System.out.println("dateToNumber: " + dateToNumber);
+       System.out.println("useKeywords: " + useKeywords);
+       
+       
+        
         ArrayList<AutocompleteObject> res = new ArrayList<>();
         boolean queryEndsWithSpace = query.charAt(query.length() - 1) == ' ';
         query = query.trim();
@@ -313,6 +343,29 @@ public class AutocompleteService {
                             //must not contain must_accept tokens
                             //res.add(new AutocompleteObject("("+query+")", query, ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, "("+query+")", AutocompleteService.TEXT, finalPunctuation, null, true));
                         }
+                         
+                        
+                        for (int i = 0; i < res.size(); i++) { //!!!
+                            AutocompleteObject r = res.get(i);
+                            System.out.println("============================================");
+                            System.out.println("res[" + i + "]");
+                            System.out.println("text:" + r.text);
+                            System.out.println("restrictedText:" + r.restrictedText);
+                            System.out.println("state:" + r.state);
+                            System.out.println("labels:" + r.labels);
+                            System.out.println("tokenType:" + r.tokenType);
+                            System.out.println("finalPunctuation:" + r.finalPunctuation);
+                            System.out.println("relatedTokenPosition:" + r.relatedTokenPosition);
+                            System.out.println("isPrefix:" + r.isPrefix);
+                            System.out.println("mustBeAccepted:" + r.mustBeAccepted);
+                            System.out.println("similarity:" + r.similarity);
+                            System.out.println("prefixSimilarity:" + r.prefixSimilarity);
+                            System.out.println("remainder:" + r.remainder);
+                            System.out.println("keywords:" + Arrays.toString(r.keywords));
+                            System.out.println("============================================");
+                        }
+                        
+                        
                         return res;
                     }
                 }
@@ -327,6 +380,7 @@ public class AutocompleteService {
                 }
             }
         }
+        
         return getFilteredAndSortedResults(query, lastAcceptedProperty, openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, 0.5, dateToNumber);
     }
 
