@@ -73,8 +73,7 @@ public class TestCanali {
                 System.out.println("keywords:" + Arrays.toString(r.keywords));
                 System.out.println("============================================");
             }
-            System.out.println("last:" + res.get(res.size() - 1).finalPunctuation);
-
+           
 //           res = new AutocompleteService().getAutocompleResults(res.get(res.size() - 1).remainder,
 //                                                                res.get(res.size() - 1).labels,
 //
