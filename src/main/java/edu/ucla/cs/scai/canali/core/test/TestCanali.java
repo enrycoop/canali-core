@@ -15,8 +15,15 @@ import java.util.Arrays;
  * @author lucia
  */
 public class TestCanali {
-
-    private String getLastAcceptedProperty(ArrayList<AutocompleteObject> acceptedTokens){
+     
+    private String  getCurrentState(ArrayList<AutocompleteObject> acceptedTokens) {
+        if (acceptedTokens.isEmpty()) {
+            return AutocompleteService.INITIAL_STATE_S0;
+        }
+        return acceptedTokens.get(acceptedTokens.size()-1).state;
+    }
+    
+    private String getLastAcceptedProperty(ArrayList<AutocompleteObject> acceptedTokens) {
         int i =  acceptedTokens.size() - 1;
         while (i > 0) {            
             if ( (!(acceptedTokens.get(i - 1)).state.equals(AutocompleteService.ACCEPT_PROPERTY_FOR_RANK_STATE_S9)) &&
@@ -27,6 +34,74 @@ public class TestCanali {
         }
         return null;
     }
+    
+    private String[] getOpenVariables(ArrayList<AutocompleteObject> acceptedTokens, boolean onlyLast){
+            int i = acceptedTokens.size() - 1;
+            String[] res = new String[3];
+            int contextVariablePosition = -1;
+            
+            while(i >= 0){
+                if(acceptedTokens.get(i).tokenType.equals(AutocompleteService.PROPERTY)){
+                    if(contextVariablePosition == -1 || contextVariablePosition == i){
+                        String[] ll = acceptedTokens.get(i).labels.split("|");
+                        for (int k = 0; k < ll.length; k++){
+                            if (res[0].length() > 0){
+                                res[0] += ",";
+                                res[1] += ",";
+                                res[2] += ",";
+                            }
+                            res[0] += ll[k];
+                            res[1] += acceptedTokens.get(i).text;
+                            res[2] += Integer.toString(i);
+                        }
+                        contextVariablePosition = acceptedTokens.get(i).relatedTokenPosition;
+                        if (onlyLast) {
+                            break;
+                        }
+                    }
+                }else if (acceptedTokens.get(i).tokenType.equals(AutocompleteService.CLASS)){
+                    if(contextVariablePosition == -1 || contextVariablePosition == i){
+                        if (res[0].length() > 0){
+                            res[0] += ",";
+                            res[1] += ",";
+                            res[2] += ",";
+                        }
+                        res[0] += acceptedTokens.get(i).labels;
+                        res[1] += acceptedTokens.get(i).text;
+                        res[2] += Integer.toString(i);
+                        contextVariablePosition = acceptedTokens.get(i).relatedTokenPosition;
+                        if (onlyLast) {
+                            break;
+                        }
+                    }
+                    
+                }else if (acceptedTokens.get(i).tokenType.equals(AutocompleteService.QUESTION_START) && acceptedTokens.get(i).labels.contains("has")) {
+                    if (res[0].length() > 0) {
+                        res[0] += ",";
+                        res[1] += ",";
+                        res[2] += ",";
+                    }
+                    res[0] += "http://www.w3.org/2002/07/owl#Thing";
+                    res[1] += acceptedTokens.get(i).text;
+                    res[2] += Integer.toString(i);
+                    contextVariablePosition = 0;
+                    if (onlyLast) {
+                        break;
+                    }
+                }
+                i--;
+                
+            }
+            return res;
+    }
+    
+    private String getFinalPunctuation(ArrayList<AutocompleteObject> acceptedTokens) {
+        if(acceptedTokens.isEmpty()) {
+            return "?";
+        }
+        return acceptedTokens.get(0).finalPunctuation;
+    }
+    
     
     @SuppressWarnings("empty-statement")
     public static void main(String... args) throws Exception {
