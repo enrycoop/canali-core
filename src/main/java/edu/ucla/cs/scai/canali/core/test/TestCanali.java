@@ -45,7 +45,7 @@ public class TestCanali {
         ArrayList<AutocompleteObject> res = new AutocompleteService().getAutocompleResults(query, lastAcceptedProperty,
                 openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, autoAcceptance, dateToNumber, useKeywords);
 
-        ArrayList<AutocompleteObject> acceptedToken = new ArrayList<AutocompleteObject>();
+        ArrayList<AutocompleteObject> acceptedTokens = new ArrayList<AutocompleteObject>();
         
 
        
