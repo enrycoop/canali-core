@@ -7,6 +7,11 @@ package edu.ucla.cs.scai.canali.core.test;
 
 import edu.ucla.cs.scai.canali.core.autocompleter.AutocompleteObject;
 import edu.ucla.cs.scai.canali.core.autocompleter.AutocompleteService;
+import edu.ucla.cs.scai.canali.core.query.QueryService;
+import edu.ucla.cs.scai.canali.core.query.ResultObject;
+import edu.ucla.cs.scai.canali.core.query.ResultWrapper;
+import edu.ucla.cs.scai.canali.core.translation.TranslationService;
+import edu.ucla.cs.scai.canali.core.translation.TranslationWrapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -189,10 +194,21 @@ public class TestCanali {
                                                                                                       useKeywords);
            acceptedTokens.add(newTokens.get(0));
             
-            
         }
         
+        String endpoint = "default";
+        int limit = 100;
+        boolean disableSubclass = true; 
+        TranslationWrapper tWrapper = new TranslationService().translateQuery(acceptedTokens, endpoint, limit, disableSubclass);
+        System.out.println("+++tWrapper query = \n"+ tWrapper.getQuery());
         
+        
+        ResultWrapper rWrapper = new QueryService().answerQuery(acceptedTokens, endpoint, limit, disableSubclass);
+        //System.out.println("+++rWrapper query = \n"+ rWrapper.);
+        ArrayList<ResultObject> results = rWrapper.getResults();
+        for (ResultObject result : results) {
+            System.out.println("result label: " + result.getL());
+        }
 //        do {
 //            System.out.println("==========testCanali");
 //            for (int i = 0; i < res.size(); i++) {
