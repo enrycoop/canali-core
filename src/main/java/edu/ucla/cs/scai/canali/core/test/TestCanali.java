@@ -15,15 +15,16 @@ import java.util.Arrays;
  * @author lucia
  */
 public class TestCanali {
+   
      
-    private String  getCurrentState(ArrayList<AutocompleteObject> acceptedTokens) {
+    private static String  getCurrentState(ArrayList<AutocompleteObject> acceptedTokens) {
         if (acceptedTokens.isEmpty()) {
             return AutocompleteService.INITIAL_STATE_S0;
         }
         return acceptedTokens.get(acceptedTokens.size()-1).state;
     }
     
-    private String getLastAcceptedProperty(ArrayList<AutocompleteObject> acceptedTokens) {
+    private static String getLastAcceptedProperty(ArrayList<AutocompleteObject> acceptedTokens) {
         int i =  acceptedTokens.size() - 1;
         while (i > 0) {            
             if ( (!(acceptedTokens.get(i - 1)).state.equals(AutocompleteService.ACCEPT_PROPERTY_FOR_RANK_STATE_S9)) &&
@@ -35,17 +36,20 @@ public class TestCanali {
         return null;
     }
     
-    private String[] getOpenVariables(ArrayList<AutocompleteObject> acceptedTokens, boolean onlyLast){
+    @SuppressWarnings("empty-statement")
+    private static String[] getOpenVariables(ArrayList<AutocompleteObject> acceptedTokens, boolean onlyLast){
             int i = acceptedTokens.size() - 1;
             String[] res = new String[3];
+            res[0] = ""; res[1] = ""; res[2] = "";
             int contextVariablePosition = -1;
             
             while(i >= 0){
                 if(acceptedTokens.get(i).tokenType.equals(AutocompleteService.PROPERTY)){
                     if(contextVariablePosition == -1 || contextVariablePosition == i){
-                        String[] ll = acceptedTokens.get(i).labels.split("|");
+                        System.out.println("label: " + acceptedTokens.get(i).labels);
+                        String[] ll = acceptedTokens.get(i).labels.split("\\|");
                         for (int k = 0; k < ll.length; k++){
-                            if (res[0].length() > 0){
+                            if (res[0]!= null && res[0].length() > 0){ //!!! div da null
                                 res[0] += ",";
                                 res[1] += ",";
                                 res[2] += ",";
@@ -54,7 +58,7 @@ public class TestCanali {
                             res[1] += acceptedTokens.get(i).text;
                             res[2] += Integer.toString(i);
                         }
-                        contextVariablePosition = acceptedTokens.get(i).relatedTokenPosition;
+                  //      contextVariablePosition = acceptedTokens.get(i).relatedTokenPosition;
                         if (onlyLast) {
                             break;
                         }
@@ -95,7 +99,7 @@ public class TestCanali {
             return res;
     }
     
-    private String getFinalPunctuation(ArrayList<AutocompleteObject> acceptedTokens) {
+    private static String getFinalPunctuation(ArrayList<AutocompleteObject> acceptedTokens) {
         if(acceptedTokens.isEmpty()) {
             return "?";
         }
@@ -105,11 +109,12 @@ public class TestCanali {
     
     @SuppressWarnings("empty-statement")
     public static void main(String... args) throws Exception {
-
+        System.out.println("Start");
+        
         String query = "What is the birth date of Alain Connes?"; //q
         String lastAcceptedProperty = null;         //p
-        String[] openVariablesUri = null;          //ou
-        Integer[] openVariablesPosition = null;     //op 
+        String[] openVariablesUri = null;          //ou //!!!
+        Integer[] openVariablesPosition = null;     //op  //!!!
         String currentState = "0";                  //s
         String finalPunctuation = null;             //f
         boolean disableContextRules = false;        //crd
@@ -117,69 +122,116 @@ public class TestCanali {
         boolean dateToNumber = false;               //dtn
         boolean useKeywords = false;                //k
         
-        ArrayList<AutocompleteObject> res = new AutocompleteService().getAutocompleResults(query, lastAcceptedProperty,
-                openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, autoAcceptance, dateToNumber, useKeywords);
 
-        ArrayList<AutocompleteObject> acceptedTokens = new ArrayList<AutocompleteObject>();
         
 
-       
-        
-        
-        
-        do {
-            System.out.println("==========testCanali");
-            for (int i = 0; i < res.size(); i++) {
-                AutocompleteObject r = res.get(i);
-                System.out.println("============================================");
-                System.out.println("res[" + i + "]");
-                System.out.println("text:" + r.text);
-                System.out.println("restrictedText:" + r.restrictedText);
-                System.out.println("state:" + r.state);
-                System.out.println("labels:" + r.labels);
-                System.out.println("tokenType:" + r.tokenType);
-                System.out.println("finalPunctuation:" + r.finalPunctuation);
-                System.out.println("relatedTokenPosition:" + r.relatedTokenPosition);
-                System.out.println("isPrefix:" + r.isPrefix);
-                System.out.println("mustBeAccepted:" + r.mustBeAccepted);
-                System.out.println("similarity:" + r.similarity);
-                System.out.println("prefixSimilarity:" + r.prefixSimilarity);
-                System.out.println("remainder:" + r.remainder);
-                System.out.println("keywords:" + Arrays.toString(r.keywords));
-                System.out.println("============================================");
-            }
-           
-//           res = new AutocompleteService().getAutocompleResults(res.get(res.size() - 1).remainder,
-//                                                                res.get(res.size() - 1).labels,
-//
-//                                                                
-//                                                                );
-            AutocompleteObject last = res.get(res.size() - 1);
-
-            String[] ou = new String[]{last.labels};
-            Integer[] op = new Integer[]{last.relatedTokenPosition};
-            res = new AutocompleteService().getAutocompleResults(
-                    last.remainder,
-                    last.labels,
-                    ou,
-                    op,
-                    last.state,
-                    last.finalPunctuation,
-                    false,
-                    true,
-                    false,
-                    false);
-
+//        ArrayList<AutocompleteObject> acceptedTokens = new AutocompleteService().getAutocompleResults(QUERY, 
+//                                                                                                      LAST_ACCEPTED_PROPERTY,
+//                                                                                                      OPEN_VARIABLES_URI, 
+//                                                                                                      OPEN_VARIABLES_POSITION, 
+//                                                                                                      STATE, 
+//                                                                                                      FINAL_PUNCTUATION, 
+//                                                                                                      CONTEXT_RULES_DISABLED,
+//                                                                                                      AUTO_ACCEPTANCE, 
+//                                                                                                      DATE_TO_NUMBER, 
+//                                                                                                      USE_KEYWORDS);
+ ArrayList<AutocompleteObject> acceptedTokens = new AutocompleteService().getAutocompleResults(query, 
+                                                                                                      lastAcceptedProperty,
+                                                                                                      openVariablesUri, 
+                                                                                                      openVariablesPosition, 
+                                                                                                      currentState, 
+                                                                                                      finalPunctuation, 
+                                                                                                      disableContextRules,
+                                                                                                      autoAcceptance, 
+                                                                                                      dateToNumber, 
+                                                                                                      useKeywords);
             
-//                    (openVariablesUri == null || openVariablesUri.length() == 0) ? null : openVariablesUri.split(","), 
+       
+        while(!query.equals(finalPunctuation)){   
+            System.out.println("nel while");
+            currentState = getCurrentState(acceptedTokens);
+            if (acceptedTokens.size() > 0) {
+                if (( acceptedTokens.get(acceptedTokens.size()-1).state.equals(AutocompleteService.ACCEPT_OPERATOR_OR_DIRECT_OPERAND_STATE_S4 )||
+                      acceptedTokens.get(acceptedTokens.size()-1).state.equals(AutocompleteService.ACCEPT_DIRECT_OPERAND_STATE_S5 )) 
+                      && 
+                      ( acceptedTokens.get(acceptedTokens.size()-1).labels.equals("year=")||
+                        acceptedTokens.get(acceptedTokens.size()-1).labels.equals("month="))){
+                    dateToNumber = true;
+                }
+                lastAcceptedProperty = getLastAcceptedProperty(acceptedTokens);
+                if (lastAcceptedProperty != null) {
+                    lastAcceptedProperty = lastAcceptedProperty;
+                }
+                boolean propertyHaving = acceptedTokens.size() > 2 &&
+                    acceptedTokens.get(acceptedTokens.size() - 1).state.equals(AutocompleteService.ACCEPT_PROPERTY_FOR_CONSTRAINT_STATE_S3) &&
+                    acceptedTokens.get(acceptedTokens.size() - 2).state.equals(AutocompleteService.ACCEPT_OPERATOR_OR_DIRECT_OPERAND_STATE_S4);
+                String[] openVariables = getOpenVariables(acceptedTokens, propertyHaving);
+                if (openVariables[0] != null) { //!!!
+                    System.out.println("open variables [0]:" + openVariables[0]);
+                    openVariablesUri = new String[]{openVariables[0]};
+                    System.out.println("open variables [2]:" + openVariables[2]);
+                    if(!openVariables[2].equals(""))
+                        openVariablesPosition = new Integer[]{Integer.parseInt(openVariables[2])};
+                }
+                finalPunctuation = getFinalPunctuation(acceptedTokens);
+                query = acceptedTokens.get(acceptedTokens.size() - 1).remainder; ///!!!
+            }
+            
+           ArrayList<AutocompleteObject> newTokens = new AutocompleteService().getAutocompleResults(query, 
+                                                                                                      lastAcceptedProperty,
+                                                                                                      openVariablesUri, 
+                                                                                                      openVariablesPosition, 
+                                                                                                      currentState, 
+                                                                                                      finalPunctuation, 
+                                                                                                      disableContextRules,
+                                                                                                      autoAcceptance, 
+                                                                                                      dateToNumber, 
+                                                                                                      useKeywords);
+           acceptedTokens.add(newTokens.get(0));
+            
+            
+        }
+        
+        
+//        do {
+//            System.out.println("==========testCanali");
+//            for (int i = 0; i < res.size(); i++) {
+//                AutocompleteObject r = res.get(i);
+//                System.out.println("============================================");
+//                System.out.println("res[" + i + "]");
+//                System.out.println("text:" + r.text);
+//                System.out.println("restrictedText:" + r.restrictedText);
+//                System.out.println("state:" + r.state);
+//                System.out.println("labels:" + r.labels);
+//                System.out.println("tokenType:" + r.tokenType);
+//                System.out.println("finalPunctuation:" + r.finalPunctuation);
+//                System.out.println("relatedTokenPosition:" + r.relatedTokenPosition);
+//                System.out.println("isPrefix:" + r.isPrefix);
+//                System.out.println("mustBeAccepted:" + r.mustBeAccepted);
+//                System.out.println("similarity:" + r.similarity);
+//                System.out.println("prefixSimilarity:" + r.prefixSimilarity);
+//                System.out.println("remainder:" + r.remainder);
+//                System.out.println("keywords:" + Arrays.toString(r.keywords));
+//                System.out.println("============================================");
+//            }
+//                                                                       
+//            AutocompleteObject last = res.get(res.size() - 1);
+//
+//            String[] ou = new String[]{last.labels};
+//            Integer[] op = new Integer[]{last.relatedTokenPosition};
+//            res = new AutocompleteService().getAutocompleResults(
+//                    last.remainder,
+//                    last.labels,
+//                    ou,
 //                    op,
-//                    state,
-//                    finalPunctuation, 
-//                    contextRulesDisabled != null && contextRulesDisabled.toLowerCase().equals("true"),
-//                    autoAcceptance != null && autoAcceptance.toLowerCase().equals("true"),
-//                    "true".equals(dateToNumber),
-//                    useKeywords.booleanValue());
-
-        } while (!res.get(res.size() - 1).state.equals("f"));
+//                    last.state,
+//                    last.finalPunctuation,
+//                    false,
+//                    true,
+//                    false,
+//                    false);
+//        } while (!res.get(res.size() - 1).state.equals("f"));
+        
+        
     }
 }
