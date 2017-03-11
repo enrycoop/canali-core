@@ -18,7 +18,7 @@ import java.util.ArrayList;
  *
  * @author lucia
  */
-public class CanaliQAsystem implements QAsystem {
+public class CanaliQASystem implements QASystem {
 
     private static String getCurrentState(ArrayList<AutocompleteObject> acceptedTokens) {
         if (acceptedTokens.isEmpty()) {

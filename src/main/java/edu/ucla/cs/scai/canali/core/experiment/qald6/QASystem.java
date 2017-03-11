@@ -11,6 +11,6 @@ import java.util.ArrayList;
  *
  * @author lucia
  */
-public interface QAsystem {
+public interface QASystem {
     public ArrayList<String> getAnswer(String query) throws Exception;
 }

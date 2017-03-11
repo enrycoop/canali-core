@@ -1,8 +1,6 @@
 package edu.ucla.cs.scai.canali.core.experiment.qald6;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import java.io.FileReader;
 
 public class QALD6Model {
 
@@ -40,7 +38,8 @@ class Query {
 class Answers {
         public Head head;
         public Results results;
-        //public String boolean;
+        @SerializedName(value="bool", alternate={"boolean"})
+        public Boolean bool;
 }
 
 class Head {
@@ -57,12 +56,12 @@ class Results {
 
 class Bindings {
     
-        @SerializedName(value="var", alternate={"uri", "num", "date", "c", "string", "height", "number", "year", "n", "x", "carbs", "ni", "name", "\"callret-0\""})
+        @SerializedName(value="var", alternate={"uri", "num", "date", "d", "c", "s", "string", "height", "number", "year", "n", "x", "carbs", "ni", "name", "\"callret-0\""})
         public Var var;
 }
 
 class Var {
         public String type;
         public String datatype;
-        public String Value;
+        public String value;
 }
