@@ -7,3 +7,6 @@ nbdist/
 target/
 nbactions.xml
 /.settings/
+/.classpath
+/.factorypath
+/.project
