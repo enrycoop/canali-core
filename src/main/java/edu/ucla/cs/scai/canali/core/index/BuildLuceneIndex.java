@@ -374,7 +374,6 @@ public class BuildLuceneIndex {
 		System.out.println("Loading property labels");
 		processePropertyLabelsFile("property_labels"); //qui
 
-		
 		for (int i = 1; i < propertyLabels.length; i++) {
 			if (propertyLabels[i] != null) {
 				System.out.println("propertyLabels[" + i + "]" + propertyLabels[i]);
@@ -390,12 +389,11 @@ public class BuildLuceneIndex {
 				System.out.println("propertyUri[" + i + "]" + " null");
 			}
 		}
-		              
 
 		//now, we drop the propertys without a label from the map of uri -> id
 		for (int i = 1; i < propertyLabels.length; i++) {
 			if (propertyLabels[i] == null) {
-//				System.out.println("removed uri: " + propertyUri[i] + "  " + i);
+				//				System.out.println("removed uri: " + propertyUri[i] + "  " + i);
 				propertyIdFromUri.remove(propertyUri[i]);
 				propertyUri[i] = null;
 			}
@@ -967,53 +965,52 @@ public class BuildLuceneIndex {
 		}
 	}
 
+	private static void indexOntologyElement(IndexWriter writer, OntologyElementToken e, Collection<String> domainOf, Collection<String> rangeOf, Collection<String> extendedDomain) throws Exception {
+		Document doc = new Document();
+		doc.add(new Field("label", e.getLabel(), TextField.TYPE_STORED));
+		doc.add(new IntField("id", e.getId(), IntField.TYPE_STORED));
+		doc.add(new Field("type", e.getType(), StringField.TYPE_STORED));
+		if (domainOf != null) {
+			for (String d : domainOf) { //the first element is the URI
+				doc.add(new Field("domainOfProperty", d, StringField.TYPE_STORED));
+			}
+		}
+		if (rangeOf != null) {
+			for (String r : rangeOf) { //the first element is the URI
+				doc.add(new Field("rangeOfProperty", r, StringField.TYPE_STORED));
+			}
+		}
+		if (extendedDomain != null) {
+			for (String d : extendedDomain) { //the first element is the URI
+				doc.add(new Field("propertyDomain", d, StringField.TYPE_STORED));
+			}
+		}
+		writer.addDocument(doc);
+	}
 
-        private static void indexOntologyElement(IndexWriter writer, OntologyElementToken e, Collection<String> domainOf, Collection<String> rangeOf, Collection<String> extendedDomain) throws Exception {
-        Document doc = new Document();
-        doc.add(new Field("label", e.getLabel(), TextField.TYPE_NOT_STORED));
-        doc.add(new IntField("id", e.getId(), IntField.TYPE_STORED));
-        doc.add(new Field("type", e.getType(), StringField.TYPE_NOT_STORED));
-        if (domainOf != null) {
-            for (String d : domainOf) { //the first element is the URI
-                doc.add(new Field("domainOfProperty", d, StringField.TYPE_NOT_STORED));
-            }
-        }
-        if (rangeOf != null) {
-            for (String r : rangeOf) { //the first element is the URI
-                doc.add(new Field("rangeOfProperty", r, StringField.TYPE_NOT_STORED));
-            }
-        }
-        if (extendedDomain != null) {
-            for (String d : extendedDomain) { //the first element is the URI
-                doc.add(new Field("propertyDomain", d, StringField.TYPE_NOT_STORED));
-            }
-        }
-        writer.addDocument(doc);
-    }
-        
-        //2
-//        private static void indexOntologyElement(IndexWriter writer, OntologyElementToken e, Collection<String> domainOf, Collection<String> rangeOf, Collection<String> extendedDomain) throws Exception {
-//		Document doc = new Document();
-//		doc.add(new Field("label", e.getLabel(), TextField.TYPE_STORED));
-//		doc.add(new LegacyIntField("id", e.getId(), LegacyIntField.TYPE_STORED));
-//		doc.add(new Field("type", e.getType(), StringField.TYPE_STORED));
-//		if (domainOf != null) {
-//			for (String d : domainOf) { //the first element is the URI
-//				doc.add(new Field("domainOfProperty", d, StringField.TYPE_NOT_STORED));
-//			}
-//		}
-//		if (rangeOf != null) {
-//			for (String r : rangeOf) { //the first element is the URI
-//				doc.add(new Field("rangeOfProperty", r, StringField.TYPE_NOT_STORED));
-//			}
-//		}
-//		if (extendedDomain != null) {
-//			for (String d : extendedDomain) { //the first element is the URI
-//				doc.add(new Field("propertyDomain", d, StringField.TYPE_STORED));
-//			}
-//		}
-//		writer.addDocument(doc);
-//	}
+	//2
+	//        private static void indexOntologyElement(IndexWriter writer, OntologyElementToken e, Collection<String> domainOf, Collection<String> rangeOf, Collection<String> extendedDomain) throws Exception {
+	//		Document doc = new Document();
+	//		doc.add(new Field("label", e.getLabel(), TextField.TYPE_STORED));
+	//		doc.add(new LegacyIntField("id", e.getId(), LegacyIntField.TYPE_STORED));
+	//		doc.add(new Field("type", e.getType(), StringField.TYPE_STORED));
+	//		if (domainOf != null) {
+	//			for (String d : domainOf) { //the first element is the URI
+	//				doc.add(new Field("domainOfProperty", d, StringField.TYPE_NOT_STORED));
+	//			}
+	//		}
+	//		if (rangeOf != null) {
+	//			for (String r : rangeOf) { //the first element is the URI
+	//				doc.add(new Field("rangeOfProperty", r, StringField.TYPE_NOT_STORED));
+	//			}
+	//		}
+	//		if (extendedDomain != null) {
+	//			for (String d : extendedDomain) { //the first element is the URI
+	//				doc.add(new Field("propertyDomain", d, StringField.TYPE_STORED));
+	//			}
+	//		}
+	//		writer.addDocument(doc);
+	//	}
 
 	private void indexEntities(IndexWriter writer, HashMap<Integer, IndexedToken> elements) throws Exception {
 		for (int i = 1; i < entityUriWithPrefix.length; i++) {//for (int i = 1; i < entityUri.length; i++) {
@@ -1223,34 +1220,33 @@ public class BuildLuceneIndex {
 			}
 		}
 
-                
-                    //save elements to file
-            System.out.println("Creating the trie");
-            Trie trie = new Trie();
-            
-            int c = 0;
-            for (IndexedToken it : elements.values()) {
-                trie.add(it.getText());
-                c++;
-                if (c % 100000 == 0) {
-                    System.out.println(c + " elements added to the trie");
-                }
-            }
-            System.out.println(c + " elements added to the trie");
-            c = 0;
-            for (IndexedToken it : elements.values()) {
-                String suffix = trie.getOneSuffix(it.getText());
-                if (suffix != null) {
-                    it.setPrefix(true);
-                    c++;
-                }
-            }
-            System.out.println(c + " are prefix of another element");
-            System.out.println("Serializing the tokens");
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(basePathOutput + "elements"))) {
-                oos.writeObject(elements);
-                oos.writeInt(IndexedToken.counter);
-            }
+		//save elements to file
+		System.out.println("Creating the trie");
+		Trie trie = new Trie();
+
+		int c = 0;
+		for (IndexedToken it : elements.values()) {
+			trie.add(it.getText());
+			c++;
+			if (c % 100000 == 0) {
+				System.out.println(c + " elements added to the trie");
+			}
+		}
+		System.out.println(c + " elements added to the trie");
+		c = 0;
+		for (IndexedToken it : elements.values()) {
+			String suffix = trie.getOneSuffix(it.getText());
+			if (suffix != null) {
+				it.setPrefix(true);
+				c++;
+			}
+		}
+		System.out.println(c + " are prefix of another element");
+		System.out.println("Serializing the tokens");
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(basePathOutput + "elements"))) {
+			oos.writeObject(elements);
+			oos.writeInt(IndexedToken.counter);
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -1272,4 +1268,3 @@ public class BuildLuceneIndex {
 		System.out.println("Indexing process finished in " + time / (double) 1000 + " sec.");
 	}
 }
-

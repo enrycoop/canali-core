@@ -79,10 +79,12 @@ public class Experimenter {
 	public static void main(String[] args) throws Exception {
 
 		//String testFilePath = "/home/lucia/nlp2sparql-data/qald6/submission1_integer_ids.json";
+		//String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_rephrase.json";
 		String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_errata.json";
 
-		// QASystem qas = new CanaliQASystem();
-		QASystem qas = new DummyQASystem();
+		//QASystem qas = new DummyQASystem();
+		QASystem qas = new CanaliQASystem();
+		System.setProperty("kb.index.dir", "/home/gaetangate/Dev/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo/");
 
 		String lang = "en";
 
@@ -99,7 +101,7 @@ public class Experimenter {
 		 * answers
 		 */
 		for (Questions qs : qsList) {
-			if (qs.onlydbo.equals("true")) {
+			//if (qs.onlydbo.equals("true")) {
 				System.out.println(qs.id + " " + qs.answertype);
 
 				/*
@@ -136,13 +138,15 @@ public class Experimenter {
 					if (q.language.equals(lang)) {
 						query = q.string;
 						systAns = qas.getAnswer(q.string);
+						if (systAns.size() == 0)
+							System.out.println("=================================================================================== " + systAns);
 					}
 				}
 
 				Result res = new Result(query, qaldAns, systAns);
 				//Result res = new Result(query, qaldAns, qaldAns);
 				results.add(res);
-			}
+			//}
 		}
 
 		printMetricAvg(results);

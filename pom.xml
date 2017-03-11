@@ -49,6 +49,44 @@
                         </configuration>
                     </execution>
                     
+                     <execution>
+                        <id>canali-dbpedia201510index-id</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>edu.ucla.cs.scai.canali.core.index.utils2.DBpedia201510Index</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>canali-DBpedia201510Index.jar</finalName>
+                        </configuration>
+                    </execution>
+                    
+                      <execution>
+                        <id>canali-dbpedia201510personindex-id</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>edu.ucla.cs.scai.canali.core.index.utils2.DBpedia201510PersonIndex</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>canali-DBpedia201510PersonIndex.jar</finalName>
+                        </configuration>
+                    </execution>
+                    
                 </executions>
             </plugin>
         </plugins>
