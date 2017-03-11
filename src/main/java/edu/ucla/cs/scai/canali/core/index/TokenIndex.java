@@ -391,6 +391,9 @@ public class TokenIndex {
 	}
 
 	public ArrayList<IndexedToken> getTokenElements(String search, String domainsOfProperty[], String rangesOfProperty[], String[] propertyDomains, int maxResults, String... tokenClasses) {
+		
+		System.out.println("SEARCH = " + search);
+		
 		ArrayList<IndexedToken> res = new ArrayList<>();
 		if (search == null) {
 			search = "";

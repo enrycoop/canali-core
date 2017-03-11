@@ -117,7 +117,7 @@ public class TestCanali {
 		System.setProperty("kb.index.dir", "/home/gaetangate/Dev/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo/");
 		System.out.println("Start");
 
-		String query = "Who is the president of Eritrea?"; //q
+		String query = "Who are the crew members of Apollo 11?"; //q
 		String lastAcceptedProperty = null; //p
 		String[] openVariablesUri = null; //ou //!!!
 		Integer[] openVariablesPosition = null; //op  //!!!
@@ -128,16 +128,6 @@ public class TestCanali {
 		boolean dateToNumber = false; //dtn
 		boolean useKeywords = false; //k
 
-		//        ArrayList<AutocompleteObject> acceptedTokens = new AutocompleteService().getAutocompleResults(QUERY, 
-		//                                                                                                      LAST_ACCEPTED_PROPERTY,
-		//                                                                                                      OPEN_VARIABLES_URI, 
-		//                                                                                                      OPEN_VARIABLES_POSITION, 
-		//                                                                                                      STATE, 
-		//                                                                                                      FINAL_PUNCTUATION, 
-		//                                                                                                      CONTEXT_RULES_DISABLED,
-		//                                                                                                      AUTO_ACCEPTANCE, 
-		//                                                                                                      DATE_TO_NUMBER, 
-		//                                                                                                      USE_KEYWORDS);
 		ArrayList<AutocompleteObject> acceptedTokens = new AutocompleteService().getAutocompleResults(query, lastAcceptedProperty, openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, autoAcceptance, dateToNumber, useKeywords);
 
 		while (!query.equals(finalPunctuation)) {
@@ -181,44 +171,7 @@ public class TestCanali {
 		for (ResultObject result : results) {
 			System.out.println("result label: " + result.getL());
 		}
-		//        do {
-		//            System.out.println("==========testCanali");
-		//            for (int i = 0; i < res.size(); i++) {
-		//                AutocompleteObject r = res.get(i);
-		//                System.out.println("============================================");
-		//                System.out.println("res[" + i + "]");
-		//                System.out.println("text:" + r.text);
-		//                System.out.println("restrictedText:" + r.restrictedText);
-		//                System.out.println("state:" + r.state);
-		//                System.out.println("labels:" + r.labels);
-		//                System.out.println("tokenType:" + r.tokenType);
-		//                System.out.println("finalPunctuation:" + r.finalPunctuation);
-		//                System.out.println("relatedTokenPosition:" + r.relatedTokenPosition);
-		//                System.out.println("isPrefix:" + r.isPrefix);
-		//                System.out.println("mustBeAccepted:" + r.mustBeAccepted);
-		//                System.out.println("similarity:" + r.similarity);
-		//                System.out.println("prefixSimilarity:" + r.prefixSimilarity);
-		//                System.out.println("remainder:" + r.remainder);
-		//                System.out.println("keywords:" + Arrays.toString(r.keywords));
-		//                System.out.println("============================================");
-		//            }
-		//                                                                       
-		//            AutocompleteObject last = res.get(res.size() - 1);
-		//
-		//            String[] ou = new String[]{last.labels};
-		//            Integer[] op = new Integer[]{last.relatedTokenPosition};
-		//            res = new AutocompleteService().getAutocompleResults(
-		//                    last.remainder,
-		//                    last.labels,
-		//                    ou,
-		//                    op,
-		//                    last.state,
-		//                    last.finalPunctuation,
-		//                    false,
-		//                    true,
-		//                    false,
-		//                    false);
-		//        } while (!res.get(res.size() - 1).state.equals("f"));
+		
 
 	}
 }

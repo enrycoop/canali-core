@@ -20,7 +20,7 @@ class Result {
 	private final String q;
 	private final ArrayList<String> qaldAns;
 	private final ArrayList<String> systAns;
-	private final double[] metrics = new double[3];
+	private final double[] metrics = new double[4];
 
 	public Result(String q, ArrayList<String> qaldAns, ArrayList<String> systAns) {
 		this.q = q;
@@ -49,6 +49,7 @@ class Result {
 		} else {
 			this.metrics[2] = (2 * this.metrics[0] * this.metrics[1]) / (this.metrics[0] + this.metrics[1]); // F-measure
 		}
+		this.metrics[3] = corrAns;
 	}
 
 }
@@ -62,15 +63,18 @@ public class Experimenter {
 		double avgR = 0;
 		double avgP = 0;
 		double avgF = 0;
+		int count = 0;
 		for (int i = 0; i < results.size(); i++) {
 			avgR += results.get(i).getMetrics()[0];
 			avgP += results.get(i).getMetrics()[1];
 			avgF += results.get(i).getMetrics()[2];
+			count += results.get(i).getMetrics()[3];
 		}
 		avgR /= results.size();
 		avgP /= results.size();
 		avgF /= results.size();
 
+		System.out.println("Count = " + count);
 		System.out.println("Recall = " + avgR);
 		System.out.println("Precision = " + avgP);
 		System.out.println("F-measure = " + avgF);
@@ -79,8 +83,8 @@ public class Experimenter {
 	public static void main(String[] args) throws Exception {
 
 		//String testFilePath = "/home/lucia/nlp2sparql-data/qald6/submission1_integer_ids.json";
-		//String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_rephrase.json";
-		String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_errata.json";
+		String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_rephrase.json";
+		//String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_errata.json";
 
 		//QASystem qas = new DummyQASystem();
 		QASystem qas = new CanaliQASystem();
@@ -95,15 +99,44 @@ public class Experimenter {
 		ArrayList<Result> results = new ArrayList<Result>();
 
 		Questions[] qsList = qald6.questions;
-
+		System.out.println(qsList.length);
 		/*
 		 * For each query in test set we get the ground truth answers and system
 		 * answers
 		 */
 		for (Questions qs : qsList) {
-			//if (qs.onlydbo.equals("true")) {
-				System.out.println(qs.id + " " + qs.answertype);
+			if (qs.onlydbo.equals("true")) {
+				System.out.print(qs.id + " " + qs.answertype);
 
+				
+
+				/*
+				 * System answers
+				 */
+				String query = "";
+				ArrayList<String> systAns = new ArrayList<String>();
+				for (Question q : qs.question) {
+					if (q.language.equals(lang)) {
+						query = q.string;
+						System.out.println(" " + query);
+						try {
+						systAns = qas.getAnswer(q.string);
+						} catch(Exception e) {
+							System.out.println("*************************************************************************************************************************");
+							System.out.println(e);
+							System.out.println("*************************************************************************************************************************");
+
+						}
+						if (systAns.size() == 0)
+							System.out.println("=================================================================================== " + systAns);
+					}
+				}
+				
+
+				for(String a: systAns) {
+					System.out.println("System = " + a);
+				}
+				
 				/*
 				 * Ground truth Answers
 				 */
@@ -128,25 +161,16 @@ public class Experimenter {
 						}
 					}
 				}
-
-				/*
-				 * System answers
-				 */
-				String query = "";
-				ArrayList<String> systAns = new ArrayList<String>();
-				for (Question q : qs.question) {
-					if (q.language.equals(lang)) {
-						query = q.string;
-						systAns = qas.getAnswer(q.string);
-						if (systAns.size() == 0)
-							System.out.println("=================================================================================== " + systAns);
-					}
+				
+				for(String a: qaldAns) {
+					System.out.println("Ground Truth = " + a);
 				}
 
 				Result res = new Result(query, qaldAns, systAns);
 				//Result res = new Result(query, qaldAns, qaldAns);
 				results.add(res);
-			//}
+			}
+			System.out.println("#########################################################################################################################################################");
 		}
 
 		printMetricAvg(results);

@@ -141,12 +141,19 @@ public class CanaliQASystem implements QASystem {
 				}
 				boolean propertyHaving = acceptedTokens.size() > 2 && acceptedTokens.get(acceptedTokens.size() - 1).state.equals(AutocompleteService.ACCEPT_PROPERTY_FOR_CONSTRAINT_STATE_S3) && acceptedTokens.get(acceptedTokens.size() - 2).state.equals(AutocompleteService.ACCEPT_OPERATOR_OR_DIRECT_OPERAND_STATE_S4);
 				String[] openVariables = getOpenVariables(acceptedTokens, propertyHaving);
-				if (openVariables[0] != null) { //!!!
+				if (openVariables[0] != null && !openVariables[0].equals("")) { //!!!
 					System.out.println("open variables [0]:" + openVariables[0]);
-					openVariablesUri = new String[] { openVariables[0] };
+					
+					openVariablesUri = openVariables[0].split(",");
 					System.out.println("open variables [2]:" + openVariables[2]);
 					if (!openVariables[2].equals("")) {
-						openVariablesPosition = new Integer[] { Integer.parseInt(openVariables[2]) };
+						
+						String[] intSplit = openVariables[2].split(",");
+						openVariablesPosition = new Integer[intSplit.length];
+						for(int i = 0; i < intSplit.length; i++) {
+							openVariablesPosition[i] = Integer.parseInt(intSplit[i]);
+						}
+						
 					}
 				}
 				finalPunctuation = getFinalPunctuation(acceptedTokens);
@@ -166,7 +173,7 @@ public class CanaliQASystem implements QASystem {
 			int limit = 100;
 			boolean disableSubclass = true;
 			TranslationWrapper tWrapper = new TranslationService().translateQuery(acceptedTokens, endpoint, limit, disableSubclass);
-			//System.out.println("+++tWrapper query = \n"+ tWrapper.getQuery());
+			System.out.println(tWrapper.getQuery());
 
 			ResultWrapper rWrapper = new QueryService().answerQuery(acceptedTokens, endpoint, limit, disableSubclass);
 			//System.out.println("+++rWrapper query = \n"+ rWrapper.);

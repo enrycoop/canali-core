@@ -562,7 +562,9 @@ public class AutocompleteService {
                     if (e instanceof ClassToken) {
                         res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
                     } else if (e instanceof AugmentedClassToken) {
+                    	System.out.println(e);
                         res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), ((AugmentedClassToken) e).getFreeText()));
+                    	//res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), ((AugmentedClassToken) e).getFreeText()));
                     } else if (e instanceof EntityToken) {
                         res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
                     } else if (e instanceof PropertyToken) {

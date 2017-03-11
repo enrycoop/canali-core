@@ -7,7 +7,7 @@ public class DummyQASystem implements QASystem {
 	@Override
 	public ArrayList<String> getAnswer(String query) throws Exception {
 		ArrayList<String> answer = new ArrayList<String>();
-		answer.add("1997-08-31");
+		answer.add("empty");
 		return answer;
 	}
 

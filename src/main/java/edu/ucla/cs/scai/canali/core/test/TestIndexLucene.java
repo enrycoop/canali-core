@@ -1,5 +1,7 @@
 package edu.ucla.cs.scai.canali.core.test;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.nio.file.Paths;
 
 import org.apache.lucene.document.Document;
@@ -13,6 +15,8 @@ import org.apache.lucene.store.RAMDirectory;
 public class TestIndexLucene {
 
 	public static void main(String[] args) throws Exception {
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter("index.txt"));
 
 		String indexPath = "/home/gaetangate/Dev/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo/lucene";
 
@@ -28,10 +32,14 @@ public class TestIndexLucene {
 		for (int i = 0; i < reader.maxDoc(); i++) {
 
 			Document doc = reader.document(i);
-			System.out.println(doc);
+			//System.out.println("id = " + doc.get("id") + ", label = " + doc.get("label") + ", type = " + doc.get("type") + ", domainOfProperty = " + doc.get("domainOfProperty") + ", rangeOfProperty = " + doc.get("rangeOfProperty")+ ", propertyDomain = " + doc.get("propertyDomain"));
+			writer.write("id = " + doc.get("id") + ", label = " + doc.get("label") + ", type = " + doc.get("type") + ", domainOfProperty = " + doc.get("domainOfProperty") + ", rangeOfProperty = " + doc.get("rangeOfProperty")+ ", propertyDomain = " + doc.get("propertyDomain"));
+			writer.newLine();
 			//String docId = doc.get("id");
 
 		}
+		
+		writer.close();
 	}
 
 }
