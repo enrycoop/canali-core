@@ -1266,7 +1266,7 @@ public class BuildLuceneIndex {
 		}
 		long start = System.currentTimeMillis();
 		System.out.println("Started at " + new Date());
-		new BuildIndex(fn1, fn2).start();
+		new BuildLuceneIndex(fn1, fn2).start();
 		System.out.println("Ended at " + new Date());
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Indexing process finished in " + time / (double) 1000 + " sec.");

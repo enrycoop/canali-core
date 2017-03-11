@@ -116,7 +116,7 @@ public class TestCanali {
     public static void main(String... args) throws Exception {
         System.out.println("Start");
         
-        String query = "What is the birth date of Alain Connes?"; //q
+        String query = "Who is the doctoral advisor of Albert Einstein?"; //q
         String lastAcceptedProperty = null;         //p
         String[] openVariablesUri = null;          //ou //!!!
         Integer[] openVariablesPosition = null;     //op  //!!!

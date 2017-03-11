@@ -75,7 +75,7 @@ public class TokenIndex {
     //static final String PATH = "/home/massimo/aquawd/processed-biomedical-ontology/";
     //static final String PATH = "/home/massimo/aquawd/processed-musicbrainz-old-ontology/";
     //static final String DEFAULT_PATH = "/home/massimo/canalikbs/dbpedia/2015-10/index/";
-    static final String DEFAULT_PATH = "/home/lucia/nlp2sparql-data/dbpedia-processed/2015-10/miniIndex";
+    static final String DEFAULT_PATH = "/home/lucia/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo";
     //static final String DEFAULT_PATH = "/home/massimo/canalikbs/biomedical/qald4/index/";
     protected static final HashMap<Integer, IndexedToken> elements;
     protected static final HashMap<String, Integer> ontologyElementsIdByUri;
