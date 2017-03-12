@@ -157,7 +157,7 @@ public class Experimenter {
 								}
 							}
 						} else {
-							qaldAns.add(Boolean.toString(ans.bool));
+							qaldAns.add(ans.bool);
 						}
 					}
 				}
