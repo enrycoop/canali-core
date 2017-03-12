@@ -39,7 +39,7 @@ class Answers {
         public Head head;
         public Results results;
         @SerializedName(value="bool", alternate={"boolean"})
-        public Boolean bool;
+        public String bool;
 }
 
 class Head {
@@ -56,7 +56,7 @@ class Results {
 
 class Bindings {
     
-        @SerializedName(value="var", alternate={"uri", "num", "date", "d", "c", "s", "string", "height", "number", "year", "n", "x", "carbs", "ni", "name", "\"callret-0\""})
+        @SerializedName(value="var", alternate={"countans", "ans", "uri", "num", "date", "d", "c", "s", "string", "height", "number", "year", "n", "x", "carbs", "ni", "name", "\"callret-0\""})
         public Var var;
 }
 
