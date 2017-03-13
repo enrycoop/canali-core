@@ -59,10 +59,10 @@ public class QueryService {
         } else {
             DEFAULT_END_POINT = endpoint;
         }
-        System.out.println("DEFAULT SPARQL ENDPOINT: " + DEFAULT_END_POINT);
-        System.out.println("Init Jena...");
+        //System.out.println("DEFAULT SPARQL ENDPOINT: " + DEFAULT_END_POINT);
+        //System.out.println("Init Jena...");
         JenaSystem.init();
-        System.out.println("Completed");
+        //System.out.println("Completed");
     }
 
     public ResultWrapper answerQuery(ArrayList<AutocompleteObject> states, String endpoint, int limit, boolean disableSubclass) throws Exception {

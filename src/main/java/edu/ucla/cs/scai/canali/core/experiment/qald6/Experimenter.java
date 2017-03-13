@@ -11,6 +11,8 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
+import edu.ucla.cs.scai.canali.core.index.TokenIndex;
+
 /**
  *
  * @author lucia
@@ -27,6 +29,7 @@ class Result {
 		this.qaldAns = qaldAns;
 		this.systAns = systAns;
 		computeMetrics(qaldAns, systAns);
+		System.out.println(metrics[0] + " " + metrics[1] + " " + metrics[2] + " " + metrics[3]);
 	}
 
 	public double[] getMetrics() {
@@ -38,8 +41,9 @@ class Result {
 			System.out.println(qaldAns.size());
 		int corrAns = 0;
 		for (String ans : systAns) {
-			if (qaldAns.contains(ans)) {
-				corrAns++;
+			for (String qa : qaldAns) {
+				if (qa.equals(ans))
+					corrAns++;
 			}
 		}
 		this.metrics[0] = corrAns / (double) qaldAns.size(); // Recall
@@ -60,9 +64,9 @@ public class Experimenter {
 		System.out.println("QA System - metrics average");
 		System.out.println("# answered questions = " + results.size());
 
-		double avgR = 0;
-		double avgP = 0;
-		double avgF = 0;
+		double avgR = 0.0;
+		double avgP = 0.0;
+		double avgF = 0.0;
 		int count = 0;
 		for (int i = 0; i < results.size(); i++) {
 			avgR += results.get(i).getMetrics()[0];
@@ -70,9 +74,9 @@ public class Experimenter {
 			avgF += results.get(i).getMetrics()[2];
 			count += results.get(i).getMetrics()[3];
 		}
-		avgR /= results.size();
-		avgP /= results.size();
-		avgF /= results.size();
+		avgR /= (double)results.size();
+		avgP /= (double)results.size();
+		avgF /= (double)results.size();
 
 		System.out.println("Count = " + count);
 		System.out.println("Recall = " + avgR);
@@ -82,13 +86,15 @@ public class Experimenter {
 
 	public static void main(String[] args) throws Exception {
 
-		//String testFilePath = "/home/lucia/nlp2sparql-data/qald6/submission1_integer_ids.json";
-		String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_rephrase.json";
-		//String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_errata.json";
+		System.setProperty("kb.index.dir", "/home/gaetangate/Dev/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo/");
+		new TokenIndex();
 
 		//QASystem qas = new DummyQASystem();
 		QASystem qas = new CanaliQASystem();
-		System.setProperty("kb.index.dir", "/home/gaetangate/Dev/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo/");
+
+		//String testFilePath = "/home/lucia/nlp2sparql-data/qald6/submission1_integer_ids.json";
+		String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_rephrase.json";
+		//String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_errata.json";
 
 		String lang = "en";
 
@@ -108,8 +114,6 @@ public class Experimenter {
 			if (qs.onlydbo.equals("true")) {
 				System.out.print(qs.id + " " + qs.answertype);
 
-				
-
 				/*
 				 * System answers
 				 */
@@ -120,23 +124,20 @@ public class Experimenter {
 						query = q.string;
 						System.out.println(" " + query);
 						try {
-						systAns = qas.getAnswer(q.string);
-						} catch(Exception e) {
-							System.out.println("*************************************************************************************************************************");
+							systAns = qas.getAnswer(q.string, qs.answertype);
+						} catch (Exception e) {
 							System.out.println(e);
-							System.out.println("*************************************************************************************************************************");
 
 						}
 						if (systAns.size() == 0)
-							System.out.println("=================================================================================== " + systAns);
+							System.out.println("WARNING - NO SYSTEM RESULTS");
 					}
 				}
-				
 
-				for(String a: systAns) {
+				for (String a : systAns) {
 					System.out.println("System = " + a);
 				}
-				
+
 				/*
 				 * Ground truth Answers
 				 */
@@ -144,7 +145,7 @@ public class Experimenter {
 				ArrayList<String> qaldAns = new ArrayList<String>();
 
 				if (qs.answers.length == 0) {
-					qaldAns.add("empty");
+					qaldAns.add(QASystem.EMPTY_RESULT);
 				} else {
 					for (Answers ans : qs.answers) {
 						if (!qs.answertype.equals("boolean")) {
@@ -161,8 +162,8 @@ public class Experimenter {
 						}
 					}
 				}
-				
-				for(String a: qaldAns) {
+
+				for (String a : qaldAns) {
 					System.out.println("Ground Truth = " + a);
 				}
 
@@ -170,7 +171,7 @@ public class Experimenter {
 				//Result res = new Result(query, qaldAns, qaldAns);
 				results.add(res);
 			}
-			System.out.println("#########################################################################################################################################################");
+			System.out.println();
 		}
 
 		printMetricAvg(results);

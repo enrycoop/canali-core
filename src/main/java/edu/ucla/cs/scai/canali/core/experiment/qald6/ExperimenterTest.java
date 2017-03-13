@@ -17,9 +17,14 @@ public class ExperimenterTest {
 		/*
 		 * System answers
 		 */
-		String query = "Who has field Computer graphics and award Academy Awards?";
+		//String query = "What is known for of Elon Musk?";
+		//String query = "What is the active years end date of Boris Becker?";
+		//String query = "What is the number of children of Jacques Cousteau?";
+		//String query = "What is the count of movies directed by Park Chan-wook?";
+		String query = "What is known for of Elon Musk?";
+		//String query = "Is there a award of Aki Kaurismäki equal to Grand Prix (Cannes Film Festival) ?";
 		ArrayList<String> systAns = new ArrayList<String>();
-		systAns = qas.getAnswer(query);
+		systAns = qas.getAnswer(query, null);
 
 		for (String a : systAns) {
 			System.out.println("System = " + a);
