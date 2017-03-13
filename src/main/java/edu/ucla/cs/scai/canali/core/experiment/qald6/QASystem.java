@@ -12,5 +12,6 @@ import java.util.ArrayList;
  * @author lucia
  */
 public interface QASystem {
-    public ArrayList<String> getAnswer(String query) throws Exception;
+	public static final String EMPTY_RESULT = "empty";
+    public ArrayList<String> getAnswer(String query, String answerType) throws Exception;
 }

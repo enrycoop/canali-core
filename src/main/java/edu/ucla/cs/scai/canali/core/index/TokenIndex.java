@@ -392,7 +392,7 @@ public class TokenIndex {
 
 	public ArrayList<IndexedToken> getTokenElements(String search, String domainsOfProperty[], String rangesOfProperty[], String[] propertyDomains, int maxResults, String... tokenClasses) {
 		
-		System.out.println("SEARCH = " + search);
+		//System.out.println("SEARCH = " + search);
 		
 		ArrayList<IndexedToken> res = new ArrayList<>();
 		if (search == null) {
@@ -477,7 +477,8 @@ public class TokenIndex {
 			BooleanQuery searchQuery = new BooleanQuery();
 			String[] ss = search.split(" ");
 			for (String s : ss) {
-				searchQuery.add(new TermQuery(new Term("label", QueryParser.escape(s))), BooleanClause.Occur.SHOULD);
+				if(!s.equals("")) // Modified to avoid query in lucene with empty label: 
+					searchQuery.add(new TermQuery(new Term("label", QueryParser.escape(s))), BooleanClause.Occur.SHOULD);
 			}
 			//searchQuery.setMinimumNumberShouldMatch(1);
 			globalQuery.add(searchQuery, BooleanClause.Occur.MUST);
@@ -544,7 +545,7 @@ public class TokenIndex {
 			Logger.getLogger(TokenIndex.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		if (classAcceptable && !classFound) {
-			System.out.println("Try class + keywords for " + search);
+			// System.out.println("Try class + keywords for " + search);
 		}
 		return res;
 	}

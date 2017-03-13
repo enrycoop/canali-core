@@ -28,11 +28,11 @@ public class ResultObject {
         this.pt = propertyText;
         this.id = uri;
         this.ide = uriEntity;
-        if (uri != null) {
+       /* if (uri != null) {
             id = uri + "/" + label;
         } else if (uriEntity != null) {
             id = uriEntity + "/" + label;
-        }
+        }*/
         this.spt = sortinPropertyText;
         this.spv = sortingPropertyValue;
     }
