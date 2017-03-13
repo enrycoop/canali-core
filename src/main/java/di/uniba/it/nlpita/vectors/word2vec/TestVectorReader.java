@@ -32,6 +32,7 @@ public class TestVectorReader {
             System.out.println("Space dimensions: " + vr.getDimension());
             System.out.println("tall");
             Vector v1 = vr.getVector("tall");
+           
             List<ObjectVector> nearestVectors = SpaceUtils.getNearestVectors(vr, v1, 50);
             for (ObjectVector ov : nearestVectors) {
                 System.out.println(ov);
