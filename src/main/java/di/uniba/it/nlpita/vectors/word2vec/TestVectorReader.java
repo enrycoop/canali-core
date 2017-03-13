@@ -27,13 +27,13 @@ public class TestVectorReader {
      */
     public static void main(String[] args) {
         try {
-            VectorReader vr = new MemoryVectorReader(new File("/home/lucia/nlp2sparql-data/w2v/abstract_200_20.w2v.bin"));
+            VectorReader vr = new MemoryVectorReader(new File("/home/gaetangate/Dev/nlp2sparql-data/abstract_200_20.w2v.bin"));
             vr.init();
             System.out.println("Space dimensions: " + vr.getDimension());
             System.out.println("tall");
             Vector v1 = vr.getVector("tall");
            
-            List<ObjectVector> nearestVectors = SpaceUtils.getNearestVectors(vr, v1, 50);
+            List<ObjectVector> nearestVectors = SpaceUtils.getNearestVectors(vr, v1, 100);
             for (ObjectVector ov : nearestVectors) {
                 System.out.println(ov);
             }
