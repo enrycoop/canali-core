@@ -539,7 +539,7 @@ public class TokenIndex {
 					if (res.size() == maxResults) {
 						//break;
 					}
-				}
+				} //qui???
 			}
 		} catch (Exception ex) {
 			Logger.getLogger(TokenIndex.class.getName()).log(Level.SEVERE, null, ex);

@@ -38,11 +38,15 @@ public class CanaliW2VQASystem implements QASystem {
 	}
 
 	private HashMap<String, Vector> dbpedia2v() throws Exception {
-		VectorReader vr = new MemoryVectorReader(new File("/home/gaetangate/Dev/nlp2sparql-data/abstract_200_20.w2v.bin"));
-		vr.init();
+		//VectorReader vr = new MemoryVectorReader(new File("/home/gaetangate/Dev/nlp2sparql-data/abstract_200_20.w2v.bin"));
+		VectorReader vr = new MemoryVectorReader(new File("/home/lucia/nlp2sparql-data/w2v/abstract_200_20.w2v.bin")); //!!!
+		
+                vr.init();
 		HashMap<String, Vector> prop2v = new HashMap<String, Vector>();
-		String sourceFile = "/home/gaetangate/Dev/nlp2sparql-data/property_labels";
-		BufferedReader in = new BufferedReader(new FileReader(sourceFile));
+		//String sourceFile = "/home/gaetangate/Dev/nlp2sparql-data/property_labels";
+		String sourceFile = "/home/lucia/nlp2sparql-data/dbpedia-processed/2015-10/dbpedia-processed_onlydbo_mini_e/supportFiles/property_labels";
+		
+                BufferedReader in = new BufferedReader(new FileReader(sourceFile));
 		String l = in.readLine();
 		while (l != null) {
 			Vector propVec = VectorFactory.createZeroVector(VectorType.REAL, vr.getDimension());
@@ -223,8 +227,9 @@ public class CanaliW2VQASystem implements QASystem {
 					System.out.println("last accepted: " + lastAcceptedToken.remainder);
 					String[] remainder = lastAcceptedToken.remainder.split(" ");
 
-					VectorReader vr = new MemoryVectorReader(new File("/home/gaetangate/Dev/nlp2sparql-data/abstract_200_20.w2v.bin"));
-					vr.init();
+					//VectorReader vr = new MemoryVectorReader(new File("/home/gaetangate/Dev/nlp2sparql-data/abstract_200_20.w2v.bin"));
+					VectorReader vr = new MemoryVectorReader(new File("/home/lucia/nlp2sparql-data/w2v/abstract_200_20.w2v.bin")); //!!!
+                                        vr.init();
 					System.out.println("r:" + remainder[0]);
 					Vector v = vr.getVector(remainder[0]);
 					Double maxSim = 0.0;

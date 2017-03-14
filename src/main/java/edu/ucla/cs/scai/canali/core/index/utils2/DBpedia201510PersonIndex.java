@@ -238,8 +238,8 @@ public class DBpedia201510PersonIndex {
             Pattern pattern = Pattern.compile("<(.*)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <(.*)>");
             
             String l = in.readLine();
-            int n = 0; //!!!
-            while (l != null && n < 1000) { //!!!
+            //int n = 0; //!!!
+            while (l != null /*&& n < 1000*/) { //!!!
                 Matcher match = pattern.matcher(l);
                 if (match.find()) {
                     String eUri = match.group(1);
@@ -249,7 +249,7 @@ public class DBpedia201510PersonIndex {
                     }
                 }
                 l = in.readLine();
-                n++; //!!!
+                //n++; //!!!
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBpedia201510PersonIndex.class.getName()).log(Level.SEVERE, null, ex);
@@ -265,8 +265,8 @@ public class DBpedia201510PersonIndex {
             Pattern pattern = Pattern.compile("<([^<>]*)>\\s<([^<>]*)>\\s<([^<>]*)>");
         
             String l = in.readLine();
-            int n = 0; //!!! to remove
-            while (l != null && n < 1000) { //!!!
+            //int n = 0; //!!! to remove
+            while (l != null /*&& n < 1000*/) { //!!!
                 Matcher match = pattern.matcher(l);
                 if (match.find()) {
                     String sbj = match.group(1);
@@ -275,7 +275,7 @@ public class DBpedia201510PersonIndex {
                     }
                 }
                 l = in.readLine();
-                n++; //!!!
+                //n++; //!!!
             }
             in.close();
             
@@ -283,7 +283,7 @@ public class DBpedia201510PersonIndex {
             pattern = Pattern.compile("<([^<>]*)>\\s<([^<>]*)>\\s\"(.*)\"");
         
             l = in.readLine();
-            while (l != null && n < 2000) { //!!!
+            while (l != null /*&& n < 2000*/) { //!!!
                 Matcher match = pattern.matcher(l);
                 if (match.find()) {
                     String sbj = match.group(1);
@@ -292,7 +292,7 @@ public class DBpedia201510PersonIndex {
                     }
                 }
                 l = in.readLine();
-                n++; //!!!
+                //n++; //!!!
             }
             in.close();
             

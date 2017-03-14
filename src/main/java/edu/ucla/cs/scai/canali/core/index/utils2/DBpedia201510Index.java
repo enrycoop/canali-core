@@ -1516,8 +1516,8 @@ public class DBpedia201510Index {
             Pattern pattern = Pattern.compile("(\\s*)<(.*)> <http://www.w3.org/2000/01/rdf-schema#label> \"(.*)\"");
             
             String l = in.readLine();
-            int n = 0; //!!! to remove
-            while (l != null && n< 1000){
+            //int n = 0; //!!! to remove
+            while (l != null /*&& n< 1000*/){
                 //System.out.println(l);
                 Matcher match = pattern.matcher(l);
                 if (match.find()){
@@ -1530,7 +1530,7 @@ public class DBpedia201510Index {
                     }
                 }
                 l = in.readLine();
-                n++;
+                //n++;
             }
             out.close();        
         } catch (FileNotFoundException ex) {
@@ -1552,8 +1552,8 @@ public class DBpedia201510Index {
             Pattern pattern = Pattern.compile("<(.*)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <(.*)>");
             
             String l = in.readLine();
-            int n = 0; //!!! to remove
-            while (l != null && n < 1000){
+            //int n = 0; //!!! to remove
+            while (l != null /*&& n < 1000*/){
                 //System.out.println(l);
                 Matcher match = pattern.matcher(l);
                 if (match.find()){
@@ -1564,7 +1564,7 @@ public class DBpedia201510Index {
                     }
                 }
                 l = in.readLine();
-                n++;
+                //n++;
             }
             out.close();        
         } catch (FileNotFoundException ex) {
@@ -1890,11 +1890,11 @@ public class DBpedia201510Index {
             PrintWriter out = new PrintWriter(new FileOutputStream(outputPath + "supportFiles/triples", false), true);
             BufferedReader in = new BufferedReader(new FileReader(sourcePath + "core-i18n/en/mappingbased_literals_en.ttl"));
             String l = in.readLine();
-            int n = 0; //!!!
-            while (l != null && n < 1000){ //!!!
+            //int n = 0; //!!!
+            while (l != null /*&& n < 1000*/){ //!!!
                 out.println(l);
                 l = in.readLine();
-                n++; //!!!
+                //n++; //!!!
             }
             in.close();
             
@@ -1908,10 +1908,10 @@ public class DBpedia201510Index {
             
             in = new BufferedReader(new FileReader(sourcePath + "core-i18n/en/mappingbased_objects_en.ttl"));
             l = in.readLine();
-            while (l != null && n < 2000){ //!!!
+            while (l != null /*&& n < 2000*/){ //!!!
                 out.println(l);
                 l = in.readLine();
-                n++; //!!!
+                //n++; //!!!
             }
             in.close();            
     }
