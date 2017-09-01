@@ -32,10 +32,10 @@ import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 /**
- *
- * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
- */
-public class AutocompleteService {
+*
+* @author Lucia Siciliani
+*/
+public class AutocompleteW2VService {
 
 	public static final String INITIAL_STATE_S0 = "0", FINAL_STATE_SF = "f", ACCEPT_CONCEPT_STATE_S1 = "1", ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2 = "2", ACCEPT_PROPERTY_FOR_CONSTRAINT_STATE_S3 = "3", ACCEPT_OPERATOR_OR_DIRECT_OPERAND_STATE_S4 = "4", ACCEPT_DIRECT_OPERAND_STATE_S5 = "5", ACCEPT_INDIRECT_OPERAND_STATE_S6 = "6", ACCEPT_SELF_PROPERTY_AS_DIRECT_OPERAND_STATE_S7 = "7", ACCEPT_SELF_PROPERTY_AS_INDIRECT_OPERAND_STATE_S8 = "8", ACCEPT_PROPERTY_FOR_RANK_STATE_S9 = "9", ACCEPT_PROPERTY_FOR_UNARY_OPERATOR_S10 = "10";
 
@@ -48,7 +48,7 @@ public class AutocompleteService {
 				String[] domains = openVariablesUri[i].split("\\|");
 				for (String domain : domains) {
 					if (property.hasPropertyOrClassDomain(domain)) {
-						res.add(new AutocompleteObject(property.getText(), property.getText(), nextState, property.getUri(), AutocompleteService.PROPERTY, null, openVariablesPosition[i], property.isPrefix(), null));
+						res.add(new AutocompleteObject(property.getText(), property.getText(), nextState, property.getUri(), AutocompleteW2VService.PROPERTY, null, openVariablesPosition[i], property.isPrefix(), null));
 						break;
 					}
 				}
@@ -184,7 +184,7 @@ public class AutocompleteService {
 		return false;
 	}
 
-	public ArrayList<AutocompleteObject> getAutocompleResults(String query, String lastAcceptedProperty, String[] openVariablesUri, Integer[] openVariablesPosition, String currentState, String finalPunctuation, boolean disableContextRules, boolean autoAcceptance, boolean dateToNumber, boolean useKeywords) {
+	public ArrayList<AutocompleteObject> getAutocompleResults(String query, String lastAcceptedProperty, String[] openVariablesUri, Integer[] openVariablesPosition, String currentState, String finalPunctuation, boolean disableContextRules, boolean autoAcceptance, boolean dateToNumber, boolean useKeywords, ArrayList<AutocompleteObject> removedTokenList) {
 	/*	System.out.println("==========getAutocompleResults");
 		System.out.println("query: " + query);
 		System.out.println("lastAcceptedProperty: " + lastAcceptedProperty);
@@ -249,7 +249,10 @@ public class AutocompleteService {
 			String remainder = "";
 			while (currentWordsUsed > 0) {
 				ArrayList<AutocompleteObject> filteredResults = getFilteredAndSortedResults(partialQuery, lastAcceptedProperty, openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, 0.90, dateToNumber);
+
 				if (!filteredResults.isEmpty()) {
+					
+					
 					boolean prefixFound = false;
 					if (currentWordsUsed == queryWords.size()) { //all the query has been used - we need to check if any of the results is prefix of another token                        
 						for (AutocompleteObject a : filteredResults) {
@@ -332,6 +335,22 @@ public class AutocompleteService {
 							System.out.println("keywords:" + Arrays.toString(r.keywords));
 							System.out.println("============================================");
 						}*/
+						
+						/*
+						 * added by Lucia Siciliani
+						 */
+						ArrayList<Integer> removedIndexList = new ArrayList<Integer>();
+						for(AutocompleteObject o: removedTokenList) {
+							for(int i = 0; i < res.size(); i++) {
+								AutocompleteObject temp = res.get(i);
+								if(temp.labels.equals(o.labels) && temp.tokenType.equals(o.tokenType)) {
+									removedIndexList.add(i);
+								}
+							}
+						}
+						for(Integer i: removedIndexList) {
+							res.remove(i);
+						}
 
 						return res;
 					}
@@ -401,19 +420,19 @@ public class AutocompleteService {
 			//being a last accepted property, an elements x can be accepted if x is in domain(A)                
 			for (Token e : ontology.getTokenElements(query, lastAcceptedPropertys, null, null, 50, IndexedToken.CLASS, IndexedToken.PROPERTY, IndexedToken.ENTITY)) {
 				if (e instanceof ClassToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteW2VService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
 				} else if (e instanceof AugmentedClassToken) {
-					res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((AugmentedClassToken) e).getClassToken().getUri(), AutocompleteService.CLASS, null, null, ((AugmentedClassToken) e).isPrefix(), ((AugmentedClassToken) e).getFreeText()));
+					res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((AugmentedClassToken) e).getClassToken().getUri(), AutocompleteW2VService.CLASS, null, null, ((AugmentedClassToken) e).isPrefix(), ((AugmentedClassToken) e).getFreeText()));
 				} else if (e instanceof EntityToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteW2VService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
 				} else if (e instanceof PropertyToken) {
-					res.add(new AutocompleteObject(e.getText() + (e.getText().endsWith(" of") ? " for" : " of"), e.getText(), ACCEPT_CONCEPT_STATE_S1, ((PropertyToken) e).getUri(), AutocompleteService.PROPERTY, null, null, ((PropertyToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText() + (e.getText().endsWith(" of") ? " for" : " of"), e.getText(), ACCEPT_CONCEPT_STATE_S1, ((PropertyToken) e).getUri(), AutocompleteW2VService.PROPERTY, null, null, ((PropertyToken) e).isPrefix(), null));
 				}
 			}
 			break;
 		case ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2:
 			//being O the set of open variables, an properties a can be accepted if the intersection between O and domain(a) is not empty
-			res.add(new AutocompleteObject(finalPunctuation, finalPunctuation, FINAL_STATE_SF, finalPunctuation, AutocompleteService.FINAL_PUNCTUATION, null, null, false, null));
+			res.add(new AutocompleteObject(finalPunctuation, finalPunctuation, FINAL_STATE_SF, finalPunctuation, AutocompleteW2VService.FINAL_PUNCTUATION, null, null, false, null));
 			ArrayList<IndexedToken> results;
 			String[] acceptableTokens;
 			if (lastAcceptedPropertys != null && lastAcceptedPropertys.length > 0) { //the operators are always applied to last accepted property
@@ -429,15 +448,15 @@ public class AutocompleteService {
 				results = ontology.getTokenElements(query, null, null, splitUris(openVariablesUri), 20, acceptableTokens);
 				for (IndexedToken e : results) {
 					if (e instanceof ConstraintPrefixToken) {
-						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_CONSTRAINT_STATE_S3, e.getText(), AutocompleteService.CONSTRAINT_PREFIX, null, null, ((ConstraintPrefixToken) e).isPrefix(), null));
+						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_CONSTRAINT_STATE_S3, e.getText(), AutocompleteW2VService.CONSTRAINT_PREFIX, null, null, ((ConstraintPrefixToken) e).isPrefix(), null));
 					} else if (e instanceof PropertyToken) {
 						res.addAll(extendPropertyWithContext((PropertyToken) e, ACCEPT_OPERATOR_OR_DIRECT_OPERAND_STATE_S4, openVariablesUri, openVariablesPosition));
 					} else if (e instanceof DirectBinaryOperatorToken) {
-						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_DIRECT_OPERAND_STATE_S5, ((DirectBinaryOperatorToken) e).getSymbol(), AutocompleteService.DIRECT_OPERATOR, null, null, ((DirectBinaryOperatorToken) e).isPrefix(), null));
+						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_DIRECT_OPERAND_STATE_S5, ((DirectBinaryOperatorToken) e).getSymbol(), AutocompleteW2VService.DIRECT_OPERATOR, null, null, ((DirectBinaryOperatorToken) e).isPrefix(), null));
 					} else if (e instanceof IndirectBinaryOperatorToken) {
-						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_INDIRECT_OPERAND_STATE_S6, ((IndirectBinaryOperatorToken) e).getSymbol(), AutocompleteService.INDIRECT_OPERATOR, null, null, ((IndirectBinaryOperatorToken) e).isPrefix(), null));
+						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_INDIRECT_OPERAND_STATE_S6, ((IndirectBinaryOperatorToken) e).getSymbol(), AutocompleteW2VService.INDIRECT_OPERATOR, null, null, ((IndirectBinaryOperatorToken) e).isPrefix(), null));
 					} else if (e instanceof UnaryOperatorToken) {
-						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_UNARY_OPERATOR_S10, ((UnaryOperatorToken) e).getSymbol(), AutocompleteService.UNARY_OPERATOR, null, null, ((UnaryOperatorToken) e).isPrefix(), null));
+						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_UNARY_OPERATOR_S10, ((UnaryOperatorToken) e).getSymbol(), AutocompleteW2VService.UNARY_OPERATOR, null, null, ((UnaryOperatorToken) e).isPrefix(), null));
 					}
 				}
 			}
@@ -446,10 +465,10 @@ public class AutocompleteService {
 			//being O the set of open variables, an properties a can be accepted if the intersection between O and domain(a) is not empty
 			if (openVariablesUri != null && openVariablesUri.length > 0) {
 				for (RankOperatorToken e : ontology.getRankOperatorElements(query)) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_RANK_STATE_S9, e.getLabel(), AutocompleteService.RANK_OPERATOR, null, null, false, null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_RANK_STATE_S9, e.getLabel(), AutocompleteW2VService.RANK_OPERATOR, null, null, false, null));
 				}
 				for (TopKOperatorToken e : ontology.getTopKOperatorElements(query)) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_RANK_STATE_S9, e.getLabel(), AutocompleteService.TOPK_OPERATOR, null, null, false, null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_RANK_STATE_S9, e.getLabel(), AutocompleteW2VService.TOPK_OPERATOR, null, null, false, null));
 				}
 				results = ontology.getTokenElements(query, null, null, splitUris(openVariablesUri), 20, IndexedToken.PROPERTY);
 				for (IndexedToken e : results) {
@@ -495,25 +514,25 @@ public class AutocompleteService {
 			}
 			for (Token e : results) {
 				if (e instanceof ClassToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteW2VService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
 				} else if (e instanceof AugmentedClassToken) {
-					res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken)e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((AugmentedClassToken) e).getClassToken().getUri(), AutocompleteService.CLASS, null, null, ((AugmentedClassToken) e).getClassToken().isPrefix(), ((AugmentedClassToken) e).getFreeText()));
+					res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken)e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((AugmentedClassToken) e).getClassToken().getUri(), AutocompleteW2VService.CLASS, null, null, ((AugmentedClassToken) e).getClassToken().isPrefix(), ((AugmentedClassToken) e).getFreeText()));
 				} else if (e instanceof EntityToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteW2VService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
 				} else if (e instanceof PropertyToken) {
-					res.add(new AutocompleteObject(e.getText() + (e.getText().endsWith(" of") ? " for" : " of"), e.getText(), ACCEPT_CONCEPT_STATE_S1, ((PropertyToken) e).getUri(), AutocompleteService.PROPERTY, null, null, ((PropertyToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText() + (e.getText().endsWith(" of") ? " for" : " of"), e.getText(), ACCEPT_CONCEPT_STATE_S1, ((PropertyToken) e).getUri(), AutocompleteW2VService.PROPERTY, null, null, ((PropertyToken) e).isPrefix(), null));
 				} else if (e instanceof DirectBinaryOperatorToken) {
 					if (((DirectBinaryOperatorToken) e).getSymbol().equals("=") || propertyWithLiteralRange) {
-						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_DIRECT_OPERAND_STATE_S5, ((DirectBinaryOperatorToken) e).getSymbol(), AutocompleteService.DIRECT_OPERATOR, null, null, ((DirectBinaryOperatorToken) e).isPrefix(), null));
+						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_DIRECT_OPERAND_STATE_S5, ((DirectBinaryOperatorToken) e).getSymbol(), AutocompleteW2VService.DIRECT_OPERATOR, null, null, ((DirectBinaryOperatorToken) e).isPrefix(), null));
 					}
 				} else if (e instanceof IndirectBinaryOperatorToken) {
 					if (((IndirectBinaryOperatorToken) e).getSymbol().equals("=") || propertyWithLiteralRange) {
-						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_INDIRECT_OPERAND_STATE_S6, ((IndirectBinaryOperatorToken) e).getSymbol(), AutocompleteService.INDIRECT_OPERATOR, null, null, ((IndirectBinaryOperatorToken) e).isPrefix(), null));
+						res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_INDIRECT_OPERAND_STATE_S6, ((IndirectBinaryOperatorToken) e).getSymbol(), AutocompleteW2VService.INDIRECT_OPERATOR, null, null, ((IndirectBinaryOperatorToken) e).isPrefix(), null));
 					}
 				} else if (e instanceof ConstraintPrefixToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_CONSTRAINT_STATE_S3, e.getText(), AutocompleteService.CONSTRAINT_PREFIX, null, null, ((ConstraintPrefixToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_CONSTRAINT_STATE_S3, e.getText(), AutocompleteW2VService.CONSTRAINT_PREFIX, null, null, ((ConstraintPrefixToken) e).isPrefix(), null));
 				} else if (e instanceof UnaryOperatorToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_UNARY_OPERATOR_S10, ((UnaryOperatorToken) e).getSymbol(), AutocompleteService.UNARY_OPERATOR, null, null, ((UnaryOperatorToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_PROPERTY_FOR_UNARY_OPERATOR_S10, ((UnaryOperatorToken) e).getSymbol(), AutocompleteW2VService.UNARY_OPERATOR, null, null, ((UnaryOperatorToken) e).isPrefix(), null));
 				}
 			}
 			break;
@@ -531,17 +550,17 @@ public class AutocompleteService {
 			}
 			for (Token e : ontology.getTokenElements(query, null, lastAcceptedPropertys, null, 20, IndexedToken.CLASS, IndexedToken.PROPERTY, IndexedToken.ENTITY, IndexedToken.POSSESSIVE_DETERMINER)) {
 				if (e instanceof ClassToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteW2VService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
 				} else if (e instanceof AugmentedClassToken) {
 					//System.out.println(e);
-					res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((AugmentedClassToken) e).getClassToken().getUri(), AutocompleteService.CLASS, null, null, ((AugmentedClassToken) e).getClassToken().isPrefix(), ((AugmentedClassToken) e).getFreeText()));
+					res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((AugmentedClassToken) e).getClassToken().getUri(), AutocompleteW2VService.CLASS, null, null, ((AugmentedClassToken) e).getClassToken().isPrefix(), ((AugmentedClassToken) e).getFreeText()));
 					//res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), ((AugmentedClassToken) e).getFreeText()));
 				} else if (e instanceof EntityToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteW2VService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
 				} else if (e instanceof PropertyToken) {
-					res.add(new AutocompleteObject(e.getText() + (e.getText().endsWith(" of") ? " for" : " of"), e.getText(), ACCEPT_CONCEPT_STATE_S1, ((PropertyToken) e).getUri(), AutocompleteService.PROPERTY, null, null, ((PropertyToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText() + (e.getText().endsWith(" of") ? " for" : " of"), e.getText(), ACCEPT_CONCEPT_STATE_S1, ((PropertyToken) e).getUri(), AutocompleteW2VService.PROPERTY, null, null, ((PropertyToken) e).isPrefix(), null));
 				} else if (e instanceof PossessiveDeterminerToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_SELF_PROPERTY_AS_DIRECT_OPERAND_STATE_S7, e.getText(), AutocompleteService.POSSESSIVE_DETERMINER, null, null, ((PossessiveDeterminerToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_SELF_PROPERTY_AS_DIRECT_OPERAND_STATE_S7, e.getText(), AutocompleteW2VService.POSSESSIVE_DETERMINER, null, null, ((PossessiveDeterminerToken) e).isPrefix(), null));
 				}
 			}
 			break;
@@ -550,15 +569,15 @@ public class AutocompleteService {
 			//being a last accepted property, an element x can be accepted if x is in domain(a).
 			for (Token e : ontology.getTokenElements(query, lastAcceptedPropertys, null, null, 20, IndexedToken.CLASS, IndexedToken.PROPERTY, IndexedToken.ENTITY, IndexedToken.POSSESSIVE_DETERMINER)) {
 				if (e instanceof ClassToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteW2VService.CLASS, null, null, ((ClassToken) e).isPrefix(), null));
 				} else if (e instanceof AugmentedClassToken) {
-					res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteService.CLASS, null, null, ((ClassToken) e).isPrefix(), ((AugmentedClassToken) e).getFreeText()));
+					res.add(new AutocompleteObject(e.getText(), ((AugmentedClassToken) e).getClassToken().getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((ClassToken) e).getUri(), AutocompleteW2VService.CLASS, null, null, ((ClassToken) e).isPrefix(), ((AugmentedClassToken) e).getFreeText()));
 				} else if (e instanceof EntityToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_CONSTRAINT_OR_FINAL_PUNCTUATION_STATE_S2, ((EntityToken) e).getUri(), AutocompleteW2VService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
 				} else if (e instanceof PropertyToken) {
-					res.add(new AutocompleteObject(e.getText() + (e.getText().endsWith(" of") ? " for" : " of"), e.getText(), ACCEPT_CONCEPT_STATE_S1, ((PropertyToken) e).getUri(), AutocompleteService.PROPERTY, null, null, ((PropertyToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText() + (e.getText().endsWith(" of") ? " for" : " of"), e.getText(), ACCEPT_CONCEPT_STATE_S1, ((PropertyToken) e).getUri(), AutocompleteW2VService.PROPERTY, null, null, ((PropertyToken) e).isPrefix(), null));
 				} else if (e instanceof PossessiveDeterminerToken) {
-					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_SELF_PROPERTY_AS_INDIRECT_OPERAND_STATE_S8, e.getText(), AutocompleteService.POSSESSIVE_DETERMINER, null, null, ((PossessiveDeterminerToken) e).isPrefix(), null));
+					res.add(new AutocompleteObject(e.getText(), e.getText(), ACCEPT_SELF_PROPERTY_AS_INDIRECT_OPERAND_STATE_S8, e.getText(), AutocompleteW2VService.POSSESSIVE_DETERMINER, null, null, ((PossessiveDeterminerToken) e).isPrefix(), null));
 				}
 			}
 			break;
@@ -643,7 +662,7 @@ public class AutocompleteService {
 		ArrayList<AutocompleteObject> res = new ArrayList<>();
 		TokenIndex ontology = new TokenIndex();
 		for (EntityToken e : ontology.getEntityElements(query, 20)) {
-			res.add(new AutocompleteObject(e.getText(), e.getText(), INITIAL_STATE_S0, ((EntityToken) e).getUri(), AutocompleteService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
+			res.add(new AutocompleteObject(e.getText(), e.getText(), INITIAL_STATE_S0, ((EntityToken) e).getUri(), AutocompleteW2VService.ENTITY, null, null, ((EntityToken) e).isPrefix(), null));
 		}
 		return res;
 	}
@@ -652,7 +671,7 @@ public class AutocompleteService {
 		ArrayList<AutocompleteObject> res = new ArrayList<>();
 		TokenIndex ontology = new TokenIndex();
 		for (PropertyToken a : ontology.getPropertyElements(query, 20)) {
-			res.add(new AutocompleteObject(a.getText(), a.getText(), INITIAL_STATE_S0, ((PropertyToken) a).getUri(), AutocompleteService.PROPERTY, null, null, ((PropertyToken) a).isPrefix(), null));
+			res.add(new AutocompleteObject(a.getText(), a.getText(), INITIAL_STATE_S0, ((PropertyToken) a).getUri(), AutocompleteW2VService.PROPERTY, null, null, ((PropertyToken) a).isPrefix(), null));
 		}
 		return res;
 	}

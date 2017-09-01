@@ -87,6 +87,25 @@
                         </configuration>
                     </execution>
                     
+                     <execution>
+                        <id>canali-W2Vtxt-id</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>di.uniba.it.nlpita.vectors.word2vec.Word2VectTxt2Bin</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>canali-W2Vtxt.jar</finalName>
+                        </configuration>
+                    </execution>
+                    
                 </executions>
             </plugin>
         </plugins>

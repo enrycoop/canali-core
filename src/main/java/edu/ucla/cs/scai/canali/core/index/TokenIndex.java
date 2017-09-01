@@ -393,6 +393,9 @@ public class TokenIndex {
 	public ArrayList<IndexedToken> getTokenElements(String search, String domainsOfProperty[], String rangesOfProperty[], String[] propertyDomains, int maxResults, String... tokenClasses) {
 		
 		System.out.println("SEARCH = " + search);
+		for(String t: tokenClasses) {
+			System.out.println("TC = " + t);
+		}
 		
 		ArrayList<IndexedToken> res = new ArrayList<>();
 		if (search == null) {
@@ -486,6 +489,7 @@ public class TokenIndex {
 			try (IndexReader reader = DirectoryReader.open(directory)) {
 				IndexSearcher searcher = new IndexSearcher(reader);
 				String queryString = globalQuery.toString(); //I need this because the parser works differently of different search features - look at its definition
+				System.out.println("QUERY = " + queryString);
 				ScoreDoc[] hits = searcher.search(parser.parse(queryString), maxResults * 5).scoreDocs;
 				for (ScoreDoc r : hits) {
 					Document doc = searcher.doc(r.doc);

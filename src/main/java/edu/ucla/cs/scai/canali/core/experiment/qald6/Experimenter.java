@@ -87,10 +87,12 @@ public class Experimenter {
 	public static void main(String[] args) throws Exception {
 
 		System.setProperty("kb.index.dir", "/home/gaetangate/Dev/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo/");
-		new TokenIndex();
+		
 
-		//QASystem qas = new DummyQASystem();
-		QASystem qas = new CanaliQASystem();
+		QASystem qas = new DummyQASystem();
+		
+		//new TokenIndex();
+		//QASystem qas = new CanaliQASystem();
 
 		//String testFilePath = "/home/lucia/nlp2sparql-data/qald6/submission1_integer_ids.json";
 		String testFilePath = "/home/gaetangate/Dev/nlp2sparql-data/qald6/test/qald-6-test-multilingual_rephrase.json";

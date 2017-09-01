@@ -117,7 +117,8 @@ public class TestCanali {
 		System.setProperty("kb.index.dir", "/home/gaetangate/Dev/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo/");
 		System.out.println("Start");
 
-		String query = "Who are the crew members of Apollo 11?"; //q
+		//String query = "Who are the crew members of Apollo 11?"; //q
+		String query = "What are the companies having industry Electonics and foundation place Beijing?"; 
 		String lastAcceptedProperty = null; //p
 		String[] openVariablesUri = null; //ou //!!!
 		Integer[] openVariablesPosition = null; //op  //!!!

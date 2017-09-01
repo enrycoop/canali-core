@@ -10,8 +10,10 @@ import di.uniba.it.nlpita.vectors.ObjectVector;
 import di.uniba.it.nlpita.vectors.Vector;
 import di.uniba.it.nlpita.vectors.VectorReader;
 import di.uniba.it.nlpita.vectors.utils.SpaceUtils;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @author pierpaolo
  */
-public class TestVectorReader {
+public class PrintVectorReader {
 
     /**
      * @param args the command line arguments
@@ -32,21 +34,15 @@ public class TestVectorReader {
         	//String modelPath = "/home/gaetangate/Dev/word2vec/models/wiki_regexp/enwiki_20161220_skip_300.bin";
         	VectorReader vr = new MemoryVectorReader(new File(modelPath));
             vr.init();
-            System.out.println("Space dimensions: " + vr.getDimension());
-            String word = "president";
-            System.out.println(word);
-            Vector v1 = vr.getVector(word);
-           
-            List<ObjectVector> nearestVectors = SpaceUtils.getNearestVectors(vr, v1, 100);
-            for (ObjectVector ov : nearestVectors) {
-                System.out.println(ov);
+            Iterator<String> words = vr.getKeys();
+            while(words.hasNext()) {
+            	System.out.println(words.next());
             }
-            System.out.println();
 
             
 
         } catch (IOException ex) {
-            Logger.getLogger(TestVectorReader.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PrintVectorReader.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

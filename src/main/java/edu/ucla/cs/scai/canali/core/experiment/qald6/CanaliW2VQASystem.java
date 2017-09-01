@@ -5,6 +5,14 @@
  */
 package edu.ucla.cs.scai.canali.core.experiment.qald6;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
 import di.uniba.it.nlpita.vectors.MemoryVectorReader;
 import di.uniba.it.nlpita.vectors.Vector;
 import di.uniba.it.nlpita.vectors.VectorFactory;
@@ -12,48 +20,76 @@ import di.uniba.it.nlpita.vectors.VectorReader;
 import di.uniba.it.nlpita.vectors.VectorType;
 import edu.ucla.cs.scai.canali.core.autocompleter.AutocompleteObject;
 import edu.ucla.cs.scai.canali.core.autocompleter.AutocompleteService;
+import edu.ucla.cs.scai.canali.core.autocompleter.AutocompleteW2VService;
 import edu.ucla.cs.scai.canali.core.query.QueryService;
 import edu.ucla.cs.scai.canali.core.query.ResultObject;
 import edu.ucla.cs.scai.canali.core.query.ResultWrapper;
 import edu.ucla.cs.scai.canali.core.translation.TranslationService;
 import edu.ucla.cs.scai.canali.core.translation.TranslationWrapper;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  *
- * @author lucia
+ * @author Lucia Siciliani
  */
 public class CanaliW2VQASystem implements QASystem {
 
-	private static HashMap<String, Vector> prop2v;
+	public static int W2V_TOPN = 10;
 
-	public CanaliW2VQASystem() throws Exception {
+	class PropSim implements Comparable<PropSim> {
+
+		String label;
+		double similarity;
+
+		public PropSim(String label, double similarity) {
+			this.label = label;
+			this.similarity = similarity;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public double getSimilarity() {
+			return similarity;
+		}
+
+		@Override
+		public int compareTo(PropSim o) {
+			if (similarity < o.similarity)
+				return 1;
+			else if (similarity > o.similarity)
+				return -1;
+			else
+				return 0;
+		}
+
+	}
+
+	private static HashMap<String, Vector> prop2v;
+	private String word2vecModelPath;
+	private String propertyLabesPath;
+	private VectorReader vr;
+
+	public CanaliW2VQASystem(String word2vecModelPath, String propertyLabesPath) throws Exception {
+		this.word2vecModelPath = word2vecModelPath;
+		this.propertyLabesPath = propertyLabesPath;
 		prop2v = dbpedia2v();
 	}
 
 	private HashMap<String, Vector> dbpedia2v() throws Exception {
-		//VectorReader vr = new MemoryVectorReader(new File("/home/gaetangate/Dev/nlp2sparql-data/abstract_200_20.w2v.bin"));
-		VectorReader vr = new MemoryVectorReader(new File("/home/lucia/nlp2sparql-data/w2v/abstract_200_20.w2v.bin")); //!!!
-		
-                vr.init();
+		this.vr = new MemoryVectorReader(new File(word2vecModelPath));
+
+		vr.init();
 		HashMap<String, Vector> prop2v = new HashMap<String, Vector>();
-		//String sourceFile = "/home/gaetangate/Dev/nlp2sparql-data/property_labels";
-		String sourceFile = "/home/lucia/nlp2sparql-data/dbpedia-processed/2015-10/dbpedia-processed_onlydbo_mini_e/supportFiles/property_labels";
-		
-                BufferedReader in = new BufferedReader(new FileReader(sourceFile));
+
+		BufferedReader in = new BufferedReader(new FileReader(propertyLabesPath));
 		String l = in.readLine();
 		while (l != null) {
 			Vector propVec = VectorFactory.createZeroVector(VectorType.REAL, vr.getDimension());
 			String[] split = l.split("\t");
 			if (split.length == 2) {
 				String propLabel = split[1];
-				System.out.println(propLabel);
+				//System.out.println(propLabel);
 				String[] propLabelTerms = propLabel.split(" ");
 				for (String propTerm : propLabelTerms) {
 					Vector propTermVec = vr.getVector(propTerm);
@@ -161,10 +197,78 @@ public class CanaliW2VQASystem implements QASystem {
 		return acceptedTokens.get(0).finalPunctuation;
 	}
 
+	/*
+	 * deprecated
+	 */
+	private String getMostSimilarProperty(String token, ArrayList<String> filter) throws Exception {
+
+		Vector v = vr.getVector(token);
+		System.out.println("r:" + token);
+
+		ArrayList<PropSim> propSimList = new ArrayList<PropSim>();
+
+		for (HashMap.Entry<String, Vector> entry : prop2v.entrySet()) {
+			String propL = entry.getKey();
+			if (!filter.contains(propL)) {
+				Vector propV = entry.getValue();
+				Double sim = v.measureOverlap(propV);
+				propSimList.add(new PropSim(propL, sim));
+			}
+		}
+		Collections.sort(propSimList);
+
+		int count = 0;
+		for (PropSim ps : propSimList) {
+			if (count > W2V_TOPN)
+				break;
+			System.out.println(ps.getLabel() + " " + ps.getSimilarity());
+			count++;
+		}
+		return propSimList.get(0).getLabel();
+
+	}
+
+	private ArrayList<String> getMostSimilarPropertyList(String token) throws Exception {
+		ArrayList<String> similarProp = new ArrayList<String>();
+		ArrayList<PropSim> propSimList = new ArrayList<PropSim>();
+		Vector v = vr.getVector(token);
+		if (v != null) {
+			System.out.println("r:" + token);
+
+			for (HashMap.Entry<String, Vector> entry : prop2v.entrySet()) {
+				String propL = entry.getKey();
+				Vector propV = entry.getValue();
+				Double sim = v.measureOverlap(propV);
+				//propSimList.add(new PropSim(propL, sim));
+				propSimList.add(new PropSim(propL, sim / propL.split(" ").length));
+			}
+			Collections.sort(propSimList);
+
+			int count = 0;
+			for (PropSim ps : propSimList) {
+				if (count > W2V_TOPN)
+					break;
+				System.out.println(ps.getLabel() + " " + ps.getSimilarity());
+				similarProp.add(ps.getLabel());
+				count++;
+			}
+
+		}
+
+		return similarProp;
+
+	}
+
 	@Override
 	public ArrayList<String> getAnswer(String query, String answerType) {
 		System.out.println("Using CanaliW2V...");
+
 		ArrayList<String> answers = new ArrayList<String>();
+
+		String lastRemainder = null;
+		HashMap<Integer, ArrayList<String>> filteredPropertyMap = new HashMap<Integer, ArrayList<String>>();
+		HashMap<Integer, ArrayList<AutocompleteObject>> removedTokenMap = new HashMap<Integer, ArrayList<AutocompleteObject>>();
+
 		try {
 
 			String lastAcceptedProperty = null; //p
@@ -179,9 +283,13 @@ public class CanaliW2VQASystem implements QASystem {
 
 			boolean isEmpty = false;
 
-			ArrayList<AutocompleteObject> acceptedTokens = new AutocompleteService().getAutocompleResults(query, lastAcceptedProperty, openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, autoAcceptance, dateToNumber, useKeywords);
+			removedTokenMap.put(0, new ArrayList<AutocompleteObject>());
+			ArrayList<AutocompleteObject> acceptedTokens = new AutocompleteW2VService().getAutocompleResults(query, lastAcceptedProperty, openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, autoAcceptance, dateToNumber, useKeywords, removedTokenMap.get(0));
 			if (acceptedTokens == null) {
 				isEmpty = true;
+			} else {
+				lastRemainder = acceptedTokens.get(acceptedTokens.size() - 1).remainder;
+				removedTokenMap.get(0).add(acceptedTokens.get(0));
 			}
 			while (!query.equals(finalPunctuation) && !isEmpty) {
 				//System.out.println("nel while");
@@ -212,41 +320,46 @@ public class CanaliW2VQASystem implements QASystem {
 						}
 					}
 					finalPunctuation = getFinalPunctuation(acceptedTokens);
-					query = acceptedTokens.get(acceptedTokens.size() - 1).remainder; ///!!!
+					//query = acceptedTokens.get(acceptedTokens.size() - 1).remainder; ///!!!
+					query = lastRemainder;
 				}
+				System.out.println("QUERY #1 = " + query);
+				if (removedTokenMap.get(acceptedTokens.size()) == null) {
+					removedTokenMap.put(acceptedTokens.size(), new ArrayList<AutocompleteObject>());
+				}
+				ArrayList<AutocompleteObject> newTokens = new AutocompleteW2VService().getAutocompleResults(query, lastAcceptedProperty, openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, autoAcceptance, dateToNumber, useKeywords, removedTokenMap.get(acceptedTokens.size()));
 
-				ArrayList<AutocompleteObject> newTokens = new AutocompleteService().getAutocompleResults(query, lastAcceptedProperty, openVariablesUri, openVariablesPosition, currentState, finalPunctuation, disableContextRules, autoAcceptance, dateToNumber, useKeywords);
 				if (newTokens != null && newTokens.size() > 0) {
 					System.out.println("newTokens = " + newTokens.get(0).text);
 					acceptedTokens.add(newTokens.get(0));
+					lastRemainder = acceptedTokens.get(acceptedTokens.size() - 1).remainder;
+					removedTokenMap.get(acceptedTokens.size() - 1).add(newTokens.get(0));
 				} else {
 
-					isEmpty = true;
+					int currentTokenIndex = acceptedTokens.size();
+					lastRemainder = acceptedTokens.get(acceptedTokens.size() - 1).remainder;
+					String[] remainder = lastRemainder.split(" ");
 
-					AutocompleteObject lastAcceptedToken = acceptedTokens.get(acceptedTokens.size() - 1);
-					System.out.println("last accepted: " + lastAcceptedToken.remainder);
-					String[] remainder = lastAcceptedToken.remainder.split(" ");
-
-					//VectorReader vr = new MemoryVectorReader(new File("/home/gaetangate/Dev/nlp2sparql-data/abstract_200_20.w2v.bin"));
-					VectorReader vr = new MemoryVectorReader(new File("/home/lucia/nlp2sparql-data/w2v/abstract_200_20.w2v.bin")); //!!!
-                                        vr.init();
-					System.out.println("r:" + remainder[0]);
-					Vector v = vr.getVector(remainder[0]);
-					Double maxSim = 0.0;
-					String simProp = null;
-
-					for (HashMap.Entry<String, Vector> entry : prop2v.entrySet()) {
-						String propL = entry.getKey();
-						Vector propV = entry.getValue();
-						System.out.println("key:" + propL + " value:" + propV);
-
-						Double sim = v.measureOverlap(propV);
-						if (sim > maxSim)
-							simProp = entry.getKey();
+					if (filteredPropertyMap.get(currentTokenIndex) == null) {
+						filteredPropertyMap.put(currentTokenIndex, getMostSimilarPropertyList(remainder[0]));
 					}
-					System.out.println("most similar prop:" + simProp);
+					if (!filteredPropertyMap.get(currentTokenIndex).isEmpty()) {
+						String nearProperty = filteredPropertyMap.get(currentTokenIndex).get(0);
+						filteredPropertyMap.get(currentTokenIndex).remove(0);
+						lastRemainder = lastRemainder.replace(remainder[0], nearProperty);
+					} else {
+						lastRemainder = acceptedTokens.get(acceptedTokens.size() - 1).remainder;
+						acceptedTokens.remove(currentTokenIndex - 1);
+						filteredPropertyMap.put(currentTokenIndex, null);
 
-					//TODO
+					}
+
+					/*
+					 * TODO ricordarsi della condizione di empty
+					 */
+					if (acceptedTokens.isEmpty()) {
+						isEmpty = true;
+					}
 
 				}
 
@@ -257,7 +370,7 @@ public class CanaliW2VQASystem implements QASystem {
 				int limit = 100000;
 				boolean disableSubclass = true;
 				TranslationWrapper tWrapper = new TranslationService().translateQuery(acceptedTokens, endpoint, limit, disableSubclass);
-				//System.out.println(tWrapper.getQuery());
+				System.out.println(tWrapper.getQuery());
 
 				ResultWrapper rWrapper = new QueryService().answerQuery(acceptedTokens, endpoint, limit, disableSubclass);
 				//System.out.println("+++rWrapper query = \n"+ rWrapper.);
