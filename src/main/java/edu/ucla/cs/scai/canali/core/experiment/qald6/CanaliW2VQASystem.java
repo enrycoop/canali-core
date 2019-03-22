@@ -348,6 +348,7 @@ public class CanaliW2VQASystem implements QASystem {
 						filteredPropertyMap.get(currentTokenIndex).remove(0);
 						lastRemainder = lastRemainder.replace(remainder[0], nearProperty);
 					} else {
+                                                System.out.println("nell'else finale");
 						lastRemainder = acceptedTokens.get(acceptedTokens.size() - 1).remainder;
 						acceptedTokens.remove(currentTokenIndex - 1);
 						filteredPropertyMap.put(currentTokenIndex, null);
@@ -364,13 +365,16 @@ public class CanaliW2VQASystem implements QASystem {
 				}
 
 			}
-
+                        System.out.println("here");
 			if (!isEmpty) {
 				String endpoint = "default";
 				int limit = 100000;
 				boolean disableSubclass = true;
 				TranslationWrapper tWrapper = new TranslationService().translateQuery(acceptedTokens, endpoint, limit, disableSubclass);
-				System.out.println(tWrapper.getQuery());
+				System.out.println("twrapper: " + tWrapper.getQuery());
+                                ///!!! to remove (made for the seodwarf demo)
+                                SeoDwarfDemo.printQuery(tWrapper.getQuery());
+                                ///
 
 				ResultWrapper rWrapper = new QueryService().answerQuery(acceptedTokens, endpoint, limit, disableSubclass);
 				//System.out.println("+++rWrapper query = \n"+ rWrapper.);

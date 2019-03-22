@@ -1,0 +1,19 @@
+PREFIX dbpedia-owl:	<http://dbpedia.org/ontology/>
+PREFIX rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbpprop:	<http://dbpedia.org/property/>
+PREFIX xsd:	<http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf:	<http://xmlns.com/foaf/0.1/>
+PREFIX rdfs:	<http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?var1 ?elabel ?eurl ?ans ?label ?url ?picture ?abstract 
+WHERE {
+	BIND(<http://seodwarf.eu/ontology/v1.0#8cd321bf-c7c0-4a0f-bb09-cfc93bc7df99> AS ?var1) .
+	?var1 <http://seodwarf.eu/ontology/v1.0#hasMaxTurbidity> ?ans . 
+	OPTIONAL {?ans rdfs:label ?label. FILTER(!bound(?label) || LANG(?label) = "" || LANGMATCHES(LANG(?label), "en"))} . 
+	OPTIONAL {?ans dbpedia-owl:thumbnail ?picture}. 
+	OPTIONAL {?ans foaf:isPrimaryTopicOf ?url. FILTER(regex(?url,'^http://en.wikipedia.org/wiki/','i'))} . 
+	OPTIONAL {?ans rdfs:comment ?abstract. FILTER(langMatches(lang(?abstract), "EN"))} . 
+	OPTIONAL {?var1 rdfs:label ?elabel. FILTER(!bound(?elabel) || LANG(?elabel) = "" || LANGMATCHES(LANG(?elabel), "en"))} . 
+	OPTIONAL {?var1 foaf:isPrimaryTopicOf ?eurl. FILTER(regex(?eurl,'^http://en.wikipedia.org/wiki/','i'))} . 
+}
+LIMIT 100000

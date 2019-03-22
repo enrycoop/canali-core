@@ -28,12 +28,12 @@ public class TestVectorReader {
     public static void main(String[] args) {
         try {
             
-        	String modelPath = "/home/gaetangate/Dev/nlp2sparql-data/abstract_200_20.w2v.bin";
+        	String modelPath = "/home/lucia/data/nlp2sparql_data/w2v/abstract_200_20.w2v.bin";
         	//String modelPath = "/home/gaetangate/Dev/word2vec/models/wiki_regexp/enwiki_20161220_skip_300.bin";
         	VectorReader vr = new MemoryVectorReader(new File(modelPath));
             vr.init();
             System.out.println("Space dimensions: " + vr.getDimension());
-            String word = "president";
+            String word = "honden";
             System.out.println(word);
             Vector v1 = vr.getVector(word);
            

@@ -75,7 +75,8 @@ public class TokenIndex {
 	//static final String PATH = "/home/massimo/aquawd/processed-biomedical-ontology/";
 	//static final String PATH = "/home/massimo/aquawd/processed-musicbrainz-old-ontology/";
 	//static final String DEFAULT_PATH = "/home/massimo/canalikbs/dbpedia/2015-10/index/";
-	static final String DEFAULT_PATH = "/home/lucia/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo";
+	//static final String DEFAULT_PATH = "/home/lucia/nlp2sparql-data/dbpedia-processed/2015-10/index_onlydbo";
+        static final String DEFAULT_PATH = "/home/lucia/data/seodwarf/index/processed";
 	//static final String DEFAULT_PATH = "/home/massimo/canalikbs/biomedical/qald4/index/";
 	protected static final HashMap<Integer, IndexedToken> elements;
 	protected static final HashMap<String, Integer> ontologyElementsIdByUri;
@@ -156,6 +157,7 @@ public class TokenIndex {
 	private static void indexQuestionStarts(IndexWriter writer) throws Exception {
 		addElement(writer, new QuestionStartToken("Give me the", IndexedToken.UNDEFINED, QuestionStartToken.PLAIN, true));
 		addElement(writer, new QuestionStartToken("Give me the count of", IndexedToken.PLURAL, QuestionStartToken.COUNT, false));
+                addElement(writer, new QuestionStartToken("Show me the", IndexedToken.UNDEFINED, QuestionStartToken.PLAIN, true)); //seo-dwarf
 		addElement(writer, new QuestionStartToken("What is", IndexedToken.SINGULAR, QuestionStartToken.PLAIN, true));
 		addElement(writer, new QuestionStartToken("What is the", IndexedToken.SINGULAR, QuestionStartToken.PLAIN, true));
 		addElement(writer, new QuestionStartToken("What is the count of", IndexedToken.PLURAL, QuestionStartToken.COUNT, false));
@@ -165,6 +167,8 @@ public class TokenIndex {
 		addElement(writer, new QuestionStartToken("Who has", IndexedToken.SINGULAR, QuestionStartToken.PLAIN, false));
 		addElement(writer, new QuestionStartToken("Who is", IndexedToken.SINGULAR, QuestionStartToken.PLAIN, true));
 		addElement(writer, new QuestionStartToken("Who is the", IndexedToken.SINGULAR, QuestionStartToken.PLAIN, false));
+                addElement(writer, new QuestionStartToken("Who was", IndexedToken.SINGULAR, QuestionStartToken.PLAIN, false));//!!!
+                addElement(writer, new QuestionStartToken("Who was the", IndexedToken.SINGULAR, QuestionStartToken.PLAIN, false));//!!!
 		addElement(writer, new QuestionStartToken("Who are the", IndexedToken.PLURAL, QuestionStartToken.PLAIN, false));
 		addElement(writer, new QuestionStartToken("Is", IndexedToken.SINGULAR, QuestionStartToken.YESNO, true));
 		addElement(writer, new QuestionStartToken("Is the", IndexedToken.SINGULAR, QuestionStartToken.YESNO, false));
