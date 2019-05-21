@@ -50,8 +50,8 @@ public class SeoDwarfIndex {
         System.out.println("SOURCE DIR: " + sourceDir);
         this.sourcePath = sourceDir;
         this.outputPath = outputDir;
-
-        dbpediaModel.read(new FileReader(sourcePath + "SeoDwarf_v1.0_no_sweet_import.owl"), "RDF/XML");
+        FileReader fr = new FileReader(sourcePath + "SeoDwarf_v1.0_no_sweet_import.owl");
+        dbpediaModel.read(fr, "RDF/XML");
         System.out.println("SeoDwarf_v1.0_no_sweet_import.owl loaded successfully...");
     }
 
@@ -72,6 +72,7 @@ public class SeoDwarfIndex {
             while (stmts.hasNext()) {
                 Statement stmt = stmts.next();
                 out.println(stmt.getSubject() + "\t" + stmt.getObject());
+                
                 classes.add(stmt.getSubject().toString());
             }
             out.close();
@@ -89,20 +90,21 @@ public class SeoDwarfIndex {
     public void createClassLabelsFile(HashSet<String> classes) throws UnsupportedEncodingException {
         System.out.println("Creating class labels file...");
         try {
-            System.out.println("Saving class labels in: \n" + outputPath + "supportFiles/class_labels");
+            System.out.println("Saving class labels in: \n" + outputPath+"indexes.rdf");
 
-            PrintWriter out = new PrintWriter(new FileOutputStream(outputPath + "supportFiles/class_labels", false), true);
+            PrintWriter out = new PrintWriter(new FileOutputStream(outputPath+"indexes.rdf", false), true);
 
             ExtendedIterator<OntClass> ontClasses = dbpediaModel.listClasses();
             while (ontClasses.hasNext()) {
                 OntClass cls = ontClasses.next();
                 if (classes.contains(cls.getURI())) {
-                    // out.println(cls.getURI() + "\t" + URLDecoder.decode(StringEscapeUtils.unescapeJava(cls.getLabel("en")), "UTF-8"));
-                    if (cls.getURI().contains("seodwarf")) {
-                        out.println(cls.getURI() + "\t" + cls.getURI().split("#")[1]);
-                    } else {
-                        out.println(cls.getURI() + "\t" + cls.getURI().split("sweet2.3/")[1]); //!!! mettere label per tutte le classi !!!
-                    }
+                    
+                    String label = null;
+                    if((label=parseURIFromLabels(cls))!=null)
+                        out.println(label);
+                    else
+                        if((label=parseURIFromString(cls))!=null)
+                            out.println(label);
                 }
             }
             out.close();
@@ -110,7 +112,40 @@ public class SeoDwarfIndex {
             Logger.getLogger(SeoDwarfIndex.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    //-------------------------------------------------------------------------------
+    public String parseURIFromLabels(OntClass cls) {
 
+        // out.println(cls.getURI() + "\t" + URLDecoder.decode(StringEscapeUtils.unescapeJava(cls.getLabel("en")), "UTF-8"));
+        if (cls.getURI().contains("seodwarf")) 
+            return cls.getURI() + "\t" + splitOnUpperCase(cls.getURI().split("#")[1]);
+        if(cls.getURI().contains("sweet2.3/"))
+            return cls.getURI() + "\t" + splitOnUpperCase(cls.getURI().split("sweet2.3/")[1]); //!!! mettere label per tutte le classi !!!
+        if(cls.getURI().contains("/v1.0#"))
+            return cls.getURI() + "\t" + splitOnUpperCase(cls.getURI().split("/v1.0#")[1]); 
+        
+        return null;
+    }
+    //-------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------
+    public String parseURIFromString(OntClass cls) {
+        //inserire metodo estrazione label basato sulla stringa dell'URI, questo metodo è alternativo a quello subito sopra
+
+        String s = cls.getURI();
+        String[] div = s.split("#");
+        if(div.length==1)
+           div = s.split("/");
+        return cls.getURI() + "\t" + splitOnUpperCase(div[div.length-1]);
+    }
+    //-------------------------------------------------------------------------------
+    
+    public String splitOnUpperCase(String s){
+        String[] r = s.split("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
+        String temp = "";
+        for (String l:r){
+            temp+=l.toLowerCase()+" ";
+        }
+        return temp.trim();
+    }
     /**
      *
      * @return @throws java.io.IOException
@@ -312,20 +347,20 @@ public class SeoDwarfIndex {
             long start = System.currentTimeMillis();
             //String directory = "/home/lucia/nlp2sparql/dbpedia/2015-10/core-i18n/en";
             //SeoDwarfIndex dbpedia = new SeoDwarfIndex(args[0], args[1]);
-            SeoDwarfIndex dbpedia = new SeoDwarfIndex("/home/lucia/data/seodwarf/2018-07/", "/home/lucia/data/seodwarf/index/");
+            SeoDwarfIndex dbpedia = new SeoDwarfIndex("C:/Users/enric/Desktop/Progetto IIA/2018-07/", "C:/Users/enric/Desktop/Progetto IIA/index/");
 
             HashSet<String> classes = dbpedia.createClassParentsFile();
 
             dbpedia.createClassLabelsFile(classes);
 
-            dbpedia.createPropertyLabelsFile();
+//            dbpedia.createPropertyLabelsFile();
 
-            HashSet<String> entities = dbpedia.createEntityLabelsFile();
+  //          HashSet<String> entities = dbpedia.createEntityLabelsFile();
 
-            dbpedia.createEntityClassesFile(entities, classes);
+   //         dbpedia.createEntityClassesFile(entities, classes);
 
             //dbpedia.createBasicTypesLiteralTypesFile();
-            dbpedia.createTripleFile();
+ //           dbpedia.createTripleFile();
 
             System.out.println("Ended at " + new Date());
             long time = System.currentTimeMillis() - start;
