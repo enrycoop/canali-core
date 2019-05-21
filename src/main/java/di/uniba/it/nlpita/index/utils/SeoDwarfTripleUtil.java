@@ -9,12 +9,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.ObjectProperty;
+import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.ontology.ProfileRegistry;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.util.iterator.ExtendedIterator;
 /**
  *
  * @author enrico coppolecchia
@@ -29,37 +42,59 @@ public class SeoDwarfTripleUtil {
     }
     public void updateTriples() throws FileNotFoundException{
         File folder = new File(sourcePath);
-        
-        HashSet<String> classes = new HashSet<>();
+        int count =0;
         for (File file : folder.listFiles()){
             FileInputStream fr = new FileInputStream(file);
             System.out.println("Reading file: "+file.getName());
             dbpediaModel.read(fr, "RDF/XML");
             System.out.println("Saving file on destination directory...");
             OntModel output = ModelFactory.createOntologyModel(ProfileRegistry.OWL_DL_LANG);
-            navigate(dbpediaModel);
+            navigate(count,dbpediaModel);
         }
-        
     }
     
     
-    public ArrayList navigate (OntModel model){
-        
-        ArrayList list = new ArrayList();
-        int count = 0;
-        StmtIterator stmts = dbpediaModel.listStatements();
-        while (stmts.hasNext()) {
-            Statement stmt = stmts.next();  
-            list.add(stmt);
-            
-            if(stmt.asTriple().toString().contains("hasPhenomenon")){
-                System.out.println(stmt+"\n\n\n\n");
-                list.add(stmt);
+    public int navigate (int count ,OntModel model){
+        HashMap<Integer,LinkedList<Triple>> map = new HashMap<Integer,LinkedList<Triple>>();
+        for (StmtIterator prop = model.listStatements();prop.hasNext();){
+            Statement pr = prop.next();
+            if(pr.asTriple().getPredicate().toString().endsWith("hasPhenomenon")){
+                
+                System.out.println(pr.asTriple().getObject().toString());
                 count++;
+                LinkedList<Triple> list = new LinkedList<Triple>();
+
+                
+                for(StmtIterator p = model.listStatements((Resource) pr.getObject(), null, (RDFNode)null);p.hasNext();){
+                    Statement proper = p.next();
+                    list.add(proper.asTriple());
+                    System.out.println("---->"+proper.asTriple());
+                 
+                }
+                map.put(count,list);
+                break;
+            }
+//            model.write(System.out);
+        }
+        for(Integer i : map.keySet()){
+            
+            Resource nuova = model.createResource("POLY"+count);
+            for(Triple s: map.get(i)){
+                if(s.toString().contains("hasPhenomenonCoverage"))
+                    nuova.addProperty(RDFS.label, filter(s.getObject().toString()));
+                System.out.println(nuova+"->>>"+nuova.getProperty(RDFS.label));
             }
         }
-        return list;
+        
+        System.out.println("-------------------------------------------------------------------------------------------------------------");
+        return count;
     }
+    
+    public String filter(String s){
+        return s.substring(0,s.indexOf("^^")).replaceAll("\"", "");
+    }
+    
+    
     public static void main(String[] args) {
         try{
             SeoDwarfTripleUtil s = new SeoDwarfTripleUtil("C:\\Users\\enric\\Desktop\\2018-07\\", "C:\\Users\\enric\\Desktop\\new\\");
