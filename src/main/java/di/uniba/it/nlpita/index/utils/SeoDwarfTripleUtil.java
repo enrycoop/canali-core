@@ -8,6 +8,9 @@ package di.uniba.it.nlpita.index.utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +31,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.semanticweb.yars.nx.namespace.RDF;
 /**
  *
  * @author enrico coppolecchia
@@ -48,8 +52,8 @@ public class SeoDwarfTripleUtil {
             System.out.println("Reading file: "+file.getName());
             dbpediaModel.read(fr, "RDF/XML");
             System.out.println("Saving file on destination directory...");
-            OntModel output = ModelFactory.createOntologyModel(ProfileRegistry.OWL_DL_LANG);
-            navigate(count,dbpediaModel);
+            count = navigate(count,dbpediaModel);
+            dbpediaModel.write(new PrintWriter(new FileOutputStream(new File(outputPath+file.getName()))));
         }
     }
     
@@ -59,9 +63,9 @@ public class SeoDwarfTripleUtil {
         for (StmtIterator prop = model.listStatements();prop.hasNext();){
             Statement pr = prop.next();
             if(pr.asTriple().getPredicate().toString().endsWith("hasPhenomenon")){
-                
-                System.out.println(pr.asTriple().getObject().toString());
                 count++;
+                System.out.println(pr.asTriple().getObject().toString());
+
                 LinkedList<Triple> list = new LinkedList<Triple>();
 
                 
@@ -72,18 +76,33 @@ public class SeoDwarfTripleUtil {
                  
                 }
                 map.put(count,list);
-                break;
+                
             }
-//            model.write(System.out);
         }
         for(Integer i : map.keySet()){
             
-            Resource nuova = model.createResource("POLY"+count);
-            for(Triple s: map.get(i)){
-                if(s.toString().contains("hasPhenomenonCoverage"))
+            Resource nuova;
+            
+            nuova = model.createResource("http://seodwarf.eu/ontology/v1.0#"+"POLY00"+ i);
+            
+           
+            map.get(i).forEach((s) -> {
+                if(s.toString().contains("hasPhenomenonCoverage")){
                     nuova.addProperty(RDFS.label, filter(s.getObject().toString()));
-                System.out.println(nuova+"->>>"+nuova.getProperty(RDFS.label));
-            }
+                }
+                else{
+                    
+                    String uri =s.getPredicate().getURI().split("#")[0];
+                    String name = s.getPredicate().getURI().split("#")[1];
+                    
+                    model.add(nuova.asResource(),model.getProperty(uri, name), s.getObject().toString().replaceAll("\"", ""));
+                    System.out.println(nuova+"->>>"+nuova.getProperty(model.getProperty(uri, name)));
+                }
+            });
+            
+            System.out.println(nuova+"->>>"+nuova.getProperty(RDFS.label));
+            
+            
         }
         
         System.out.println("-------------------------------------------------------------------------------------------------------------");
