@@ -62,7 +62,8 @@ public class SeoDwarfTripleUtil {
         HashMap<Integer,LinkedList<Triple>> map = new HashMap<Integer,LinkedList<Triple>>();
         for (StmtIterator prop = model.listStatements();prop.hasNext();){
             Statement pr = prop.next();
-            if(pr.asTriple().getPredicate().toString().endsWith("hasPhenomenon")){
+            if(pr.asTriple().getObject().isBlank()){
+                
                 count++;
                 System.out.println(pr.asTriple().getObject().toString());
 
